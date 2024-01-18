@@ -1,0 +1,8 @@
+## Interface: 30300
+## Title: XanAscTweaks
+## Author: Xan
+## Notes: Provides a collection of settings to adjust Ascension behavior that are not supported with default tools
+## SavedVariables: XanAscTweaks
+
+Xan_Wait.lua
+XanAscTweaks.lua
