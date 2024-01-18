@@ -182,8 +182,9 @@ end
 function XAT.frame:PLAYER_ENTERING_WORLD(event, ...)
     -- set up Ascension filters
     filters["Htrial:%d-:"] = XanAscTweaks.filtertrial -- Trials
-    filters["Hitem:1179126"] = XanAscTweaks.filtertrial -- Mystic Enchanting Altar
-    filters["%[.-Ascension.-Autobroadcast.-%]"] = XanAscTweaks.filtertrial -- Auto Broadcasts
+    filters["%[.-Resolute.-Mode.-%]"] = XanAscTweaks.filtertrial -- Auto Broadcasts
+    filters["Hitem:1179126"] = XanAscTweaks.filterMEA -- Mystic Enchanting Altar
+    filters["%[.-Ascension.-Autobroadcast.-%]"] = XanAscTweaks.filterAuto -- Auto Broadcasts
     filters["%[.-Conquest of Azeroth Travel Guide.-%]"] = XanAscTweaks.filterCOA
     filters["%[.-Northrend Travel Guide.-%]"] = XanAscTweaks.filterBAU
 
