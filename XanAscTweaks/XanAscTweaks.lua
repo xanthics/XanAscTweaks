@@ -20,8 +20,12 @@ local function status(val)
 end
 
 function XAT:printmsg(message, ...)
-
-    DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": " .. message)
+    local hideheader = ...
+    if hideheader then
+        DEFAULT_CHAT_FRAME:AddMessage(message)
+    else
+        DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": " .. message)
+    end
 end
 
 -- toggle the state of a flag
@@ -71,7 +75,7 @@ function XAT:CommandHandler(msg)
 	elseif cmd == "twitch" then
 		XanAscTweaks.filterTwitch = toggle(XanAscTweaks.filterTwitch, "Twitch in chat")
  	else
-		XAT:printmsg("Use '/xat option` where option can be one of; say, yell, button, trial, altar, autobroadcast, new, ascension, world, coa, bau, bauchat, dp, twitch.", true)
+		XAT:printmsg("Use '/xat option` where option can be one of; say, yell, button, trial, altar, autobroadcast, new, ascension, world, coa, bau, bauchat, dp, twitch.")
         local options = {
             status(XanAscTweaks.filtersay).." `say` removed in rest areas",
             status(XanAscTweaks.filteryell).." `yell` removed in rest areas",
@@ -89,7 +93,7 @@ function XAT:CommandHandler(msg)
             status(XanAscTweaks.filterTwitch).." `twitch` is hiding twitch links in Ascension and Newcomers",
         }
         for _,option in pairs(options) do
-            XAT:printmsg(option, false)
+            XAT:printmsg(option, true)
         end
 	end
     if reload then
@@ -113,10 +117,10 @@ end
 -- hide say/yell when in a city
 local function filterAll(self, event, ...)    
     if IsResting() then
-        if event == "CHAT_MSG_SAY" and XanAscTweaks.filtersay then
+        if XanAscTweaks.filtersay and event == "CHAT_MSG_SAY" then
             return true
         end
-        if event == "CHAT_MSG_YELL" and XanAscTweaks.filteryell then
+        if XanAscTweaks.filteryell and event == "CHAT_MSG_YELL" then
             return true
         end
     end
