@@ -51,10 +51,15 @@ function XAT:CommandHandler(msg)
 		reload = true
 	elseif cmd == "trial" then
 		XanAscTweaks.filtertrial = toggle(XanAscTweaks.filtertrial, "trial")
+		filters["Htrial:%d-:"] = XanAscTweaks.filtertrial or nil -- Trials
+		filters["%[.-Resolute.-Mode.-%]"] = XanAscTweaks.filtertrial or nil
+		filters["%[.-Nightmare.-%]"] = XanAscTweaks.filtertrial or nil
 	elseif cmd == "altar" then
 		XanAscTweaks.filterMEA = toggle(XanAscTweaks.filterMEA, "altar")
+		filters["Hitem:1179126"] = XanAscTweaks.filterMEA or nil -- Mystic Enchanting Altar
 	elseif cmd == "autobroadcast" then
 		XanAscTweaks.filterAuto = toggle(XanAscTweaks.filterAuto, "autobroadcast")
+		filters["%[.-Ascension.-Autobroadcast.-%]"] = XanAscTweaks.filterAuto or nil -- Auto Broadcasts
 	elseif cmd == "new" then
 		XanAscTweaks.filterNew = toggle(XanAscTweaks.filterNew, "Newcomers chat")
 		reload = true
@@ -66,8 +71,10 @@ function XAT:CommandHandler(msg)
 		reload = true
 	elseif cmd == "coa" then
 		XanAscTweaks.filterCOA = toggle(XanAscTweaks.filterCOA, "Conquest of Azeroth Travel Guide")
+		filters["%[.-Conquest of Azeroth Travel Guide.-%]"] = XanAscTweaks.filterCOA or nil
 	elseif cmd == "bau" then
 		XanAscTweaks.filterBAU = toggle(XanAscTweaks.filterBAU, "Northrend Travel Guide")
+		filters["%[.-Northrend Travel Guide.-%]"] = XanAscTweaks.filterBAU or nil
 	elseif cmd == "bauchat" then
 		XanAscTweaks.filterBAUAsc = toggle(XanAscTweaks.filterBAUAsc, "bau in chat")
 	elseif cmd == "dp" then
@@ -181,13 +188,13 @@ end
 
 function XAT.frame:PLAYER_ENTERING_WORLD(event, ...)
 	-- set up Ascension filters
-	filters["Htrial:%d-:"] = XanAscTweaks.filtertrial -- Trials
-	filters["%[.-Resolute.-Mode.-%]"] = XanAscTweaks.filtertrial
-	filters["%[.-Nightmare.-%]"] = XanAscTweaks.filtertrial
-	filters["Hitem:1179126"] = XanAscTweaks.filterMEA -- Mystic Enchanting Altar
-	filters["%[.-Ascension.-Autobroadcast.-%]"] = XanAscTweaks.filterAuto -- Auto Broadcasts
-	filters["%[.-Conquest of Azeroth Travel Guide.-%]"] = XanAscTweaks.filterCOA
-	filters["%[.-Northrend Travel Guide.-%]"] = XanAscTweaks.filterBAU
+	filters["Htrial:%d-:"] = XanAscTweaks.filtertrial or nil -- Trials
+	filters["%[.-Resolute.-Mode.-%]"] = XanAscTweaks.filtertrial or nil
+	filters["%[.-Nightmare.-%]"] = XanAscTweaks.filtertrial or nil
+	filters["Hitem:1179126"] = XanAscTweaks.filterMEA or nil -- Mystic Enchanting Altar
+	filters["%[.-Ascension.-Autobroadcast.-%]"] = XanAscTweaks.filterAuto or nil -- Auto Broadcasts
+	filters["%[.-Conquest of Azeroth Travel Guide.-%]"] = XanAscTweaks.filterCOA or nil
+	filters["%[.-Northrend Travel Guide.-%]"] = XanAscTweaks.filterBAU or nil
 
 	if XanAscTweaks.hideAscButton then
 		LibDBIcon10_AscensionUICA2:Hide()
