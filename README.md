@@ -19,6 +19,7 @@ By default:
 `bauchat` is hiding BAU from Ascension and Newcomers
 `dp` is hiding messages that contain dp and don't contain dps
 `twitch` is hiding twitch links in Ascension and Newcomers
+`vanity` to automatically grab mounts, pets, and stones of retreat
 
 If you upgrade from a previous version, any new options will be disabled.
 ```

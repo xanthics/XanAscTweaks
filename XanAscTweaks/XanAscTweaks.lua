@@ -4,7 +4,63 @@ XAT.__index = XAT
 
 XAT.frame = CreateFrame("Frame") -- used multiple times
 local filters = {}
-local reload -- track whether a change has been made that requires a reload to take effect
+local reload                     -- track whether a change has been made that requires a reload to take effect
+
+function XAT:getVanity()
+	DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": " .. #XAT.grablist .. " item(s) left to grab.")
+	local next = table.remove(XAT.grablist)
+	if C_VanityCollection.IsCollectionItemOwned(next) then
+		RequestDeliverVanityCollectionItem(next)
+	end
+	if #XAT.grablist > 0 then
+		XAT:wait(1, XAT.getVanity, self)
+	end
+end
+
+function XAT:grabVanity()
+	XAT.grablist = {}
+	local known_spells = {}
+	for i = 1, GetNumCompanions("CRITTER") do
+		local _, _, sID = GetCompanionInfo("CRITTER", i)
+		known_spells[sID] = true
+	end
+	for i = 1, GetNumCompanions("MOUNT") do
+		local _, _, sID = GetCompanionInfo("MOUNT", i)
+		known_spells[sID] = true
+	end
+
+	local valid = {
+		["Mount"] = true,
+		["Pet"] = true,
+	}
+
+	local badItems = {
+		["Alliance"] = {
+			[1780054] = true, -- Stone of Retreat: Razor Hill
+		},
+		["Horde"] = {
+--			[1780051] = true, -- Stone of Retreat: Goldshire
+		}
+	}
+
+	for k, v in pairs(VANITY_ITEMS) do
+		if C_VanityCollection.IsCollectionItemOwned(k) and v.learnedSpell > 1 then
+			local _, _, _, _, _, _, s = GetItemInfo(v.itemid)
+			if (v.name:find("Stone of") and not IsSpellKnown(v.learnedSpell)) or (valid[s] and not known_spells[v.learnedSpell]) then
+				if badItems[UnitFactionGroup("player")][v.itemid] then
+					DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": Skipping" .. v.name .. " as it is bugged and gives an unusable item instead of the spell.")
+				else
+					table.insert(XAT.grablist, k)
+				end
+			end
+		end
+	end
+	if #XAT.grablist > 0 then
+		DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") ..
+		": Grabbing " .. #XAT.grablist .. " unlearned vanity mounts, pets, and stones.")
+		XAT:wait(1, XAT.getVanity, self)
+	end
+end
 
 -- add color markup to a string
 function XAT:setColor(val)
@@ -16,7 +72,6 @@ local function status(val)
 		return "|cFF00FF00On|r"
 	end
 	return "|cFFFF0000Off|r"
-
 end
 
 function XAT:printmsg(message, ...)
@@ -31,10 +86,10 @@ end
 -- toggle the state of a flag
 local function toggle(var, text)
 	if var then
-		XAT:printmsg("`"..text.."` is deactivated.")
-		return false
+		XAT:printmsg("`" .. text .. "` is deactivated.")
+		return
 	else
-		XAT:printmsg("`"..text.."` is now active.")
+		XAT:printmsg("`" .. text .. "` is now active.")
 		return true
 	end
 end
@@ -81,25 +136,32 @@ function XAT:CommandHandler(msg)
 		XanAscTweaks.filterDP = toggle(XanAscTweaks.filterDP, "dp in chat")
 	elseif cmd == "twitch" then
 		XanAscTweaks.filterTwitch = toggle(XanAscTweaks.filterTwitch, "Twitch in chat")
- 	else
+	elseif cmd == "vanity" then
+		XanAscTweaks.autoGrabVanity = toggle(XanAscTweaks.autoGrabVanity, "Auto-grab Vanity")
+		if XanAscTweaks.autoGrabVanity then
+			XAT:grabVanity()
+		end
+	else
 		XAT:printmsg("Use '/xat option` where option can be one of;")
 		local options = {
-			status(XanAscTweaks.filtersay).." `say` removed in rest areas",
-			status(XanAscTweaks.filteryell).." `yell` removed in rest areas",
-			status(XanAscTweaks.hideAscButton).." `button` is hiding Ascension Button",
-			status(XanAscTweaks.filtertrial).." `trial` Broadcasts are being filtered",
-			status(XanAscTweaks.filterMEA).." `altar` is hiding Mystic Enchanting Altar Broadcasts",
-			status(XanAscTweaks.filterAuto).." `autobroadcast` messages are being hidden",
-			status(XanAscTweaks.filterNew).." `new` is removing Newcomers from first chat tab",
-			status(XanAscTweaks.filterAscension).." `ascension` is removing Ascension from first chat tab",
-			status(XanAscTweaks.filterWorld).." `world`  is removing World from first chat tab",
-			status(XanAscTweaks.filterCOA).." `coa` is filtering Conquest of Azeroth Travel Guide",
-			status(XanAscTweaks.filterBAU).." `bau` is filtering Northrend Travel Guide",
-			status(XanAscTweaks.filterBAUAsc).." `bauchat` is hiding BAU from Ascension and Newcomers",
-			status(XanAscTweaks.filterDP).." `dp` is hiding messages that contain dp and don't contain dps",
-			status(XanAscTweaks.filterTwitch).." `twitch` is hiding twitch links in Ascension and Newcomers",
+			status(XanAscTweaks.filtersay) .. " `say` removed in rest areas",
+			status(XanAscTweaks.filteryell) .. " `yell` removed in rest areas",
+			status(XanAscTweaks.hideAscButton) .. " `button` is hiding Ascension Button",
+			status(XanAscTweaks.filtertrial) .. " `trial` Broadcasts are being filtered",
+			status(XanAscTweaks.filterMEA) .. " `altar` is hiding Mystic Enchanting Altar Broadcasts",
+			status(XanAscTweaks.filterAuto) .. " `autobroadcast` messages are being hidden",
+			status(XanAscTweaks.filterNew) .. " `new` is removing Newcomers from first chat tab",
+			status(XanAscTweaks.filterAscension) .. " `ascension` is removing Ascension from first chat tab",
+			status(XanAscTweaks.filterWorld) .. " `world`  is removing World from first chat tab",
+			status(XanAscTweaks.filterCOA) .. " `coa` is filtering Conquest of Azeroth Travel Guide",
+			status(XanAscTweaks.filterBAU) .. " `bau` is filtering Northrend Travel Guide",
+			status(XanAscTweaks.filterBAUAsc) .. " `bauchat` is hiding BAU from Ascension and Newcomers",
+			status(XanAscTweaks.filterDP) .. " `dp` is hiding messages that contain dp and don't contain dps",
+			status(XanAscTweaks.filterTwitch) .. " `twitch` is hiding twitch links in Ascension and Newcomers",
+			status(XanAscTweaks.autoGrabVanity) ..
+			" `vanity` is automatically grabbing vanity mounts, pets, and stones of retreat.",
 		}
-		for _,option in pairs(options) do
+		for _, option in pairs(options) do
 			XAT:printmsg(option, true)
 		end
 	end
@@ -122,7 +184,7 @@ function XAT:hideNew()
 end
 
 -- hide say/yell when in a city
-local function filterAll(self, event, ...)    
+local function filterAll(self, event, ...)
 	if IsResting() then
 		if XanAscTweaks.filtersay and event == "CHAT_MSG_SAY" then
 			return true
@@ -138,7 +200,7 @@ end
 local function filterSystem(self, event, msg, ...)
 	if event ~= "CHAT_MSG_SYSTEM" or not msg then return false end
 
-	for filter,_ in pairs(filters) do
+	for filter, _ in pairs(filters) do
 		if msg:find(filter) then
 			-- match found, suppress the message
 			return true
@@ -179,8 +241,8 @@ function XAT.frame:ADDON_LOADED(event, ...)
 
 	if XanAscTweaks == nil then
 		XanAscTweaks = {}
-		for _,v in pairs({"filtersay", "filteryell", "hideAscButton", "filtertrial", "filterMEA", "filterAuto", "filterNew", 
-						  "filterAscension", "filterWorld", "filterCOA", "filterBAU", "filterBAUAsc", "filterDP", "filterTwitch"}) do
+		for _, v in pairs({ "filtersay", "filteryell", "hideAscButton", "filtertrial", "filterMEA", "filterAuto", "filterNew",
+			"filterAscension", "filterWorld", "filterCOA", "filterBAU", "filterBAUAsc", "filterDP", "filterTwitch" }) do
 			XanAscTweaks[v] = true
 		end
 	end
@@ -191,10 +253,14 @@ function XAT.frame:PLAYER_ENTERING_WORLD(event, ...)
 	filters["Htrial:%d-:"] = XanAscTweaks.filtertrial or nil -- Trials
 	filters["%[.-Resolute.-Mode.-%]"] = XanAscTweaks.filtertrial or nil
 	filters["%[.-Nightmare.-%]"] = XanAscTweaks.filtertrial or nil
-	filters["Hitem:1179126"] = XanAscTweaks.filterMEA or nil -- Mystic Enchanting Altar
+	filters["Hitem:1179126"] = XanAscTweaks.filterMEA or nil                  -- Mystic Enchanting Altar
 	filters["%[.-Ascension.-Autobroadcast.-%]"] = XanAscTweaks.filterAuto or nil -- Auto Broadcasts
 	filters["%[.-Conquest of Azeroth Travel Guide.-%]"] = XanAscTweaks.filterCOA or nil
 	filters["%[.-Northrend Travel Guide.-%]"] = XanAscTweaks.filterBAU or nil
+
+	if XanAscTweaks.autoGrabVanity then
+		XAT:wait(5, XAT.grabVanity, self)
+	end
 
 	if XanAscTweaks.hideAscButton then
 		LibDBIcon10_AscensionUICA2:Hide()
