@@ -46,7 +46,8 @@ function XAT:grabVanity()
 	for k, v in pairs(VANITY_ITEMS) do
 		if C_VanityCollection.IsCollectionItemOwned(k) and v.learnedSpell > 1 then
 			local _, _, _, _, _, _, s = GetItemInfo(v.itemid)
-			if (v.name:find("Stone of") and not IsSpellKnown(v.learnedSpell)) or (valid[s] and not known_spells[v.learnedSpell]) then
+			if ((v.name:find("Stone of") or v.name:find("Tome of")) and not IsSpellKnown(v.learnedSpell)) or
+			(valid[s] and not known_spells[v.learnedSpell]) then
 				if badItems[UnitFactionGroup("player")][v.itemid] then
 					DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": Skipping" .. v.name .. " as it is bugged and gives an unusable item instead of the spell.")
 				else
