@@ -36,7 +36,7 @@ function XAT:grabVanity()
 
 	local badItems = {
 		["Alliance"] = {
-			[1780054] = true, -- Stone of Retreat: Razor Hill
+--			[1780054] = true, -- Stone of Retreat: Razor Hill
 		},
 		["Horde"] = {
 --			[1780051] = true, -- Stone of Retreat: Goldshire
