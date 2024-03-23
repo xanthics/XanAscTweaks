@@ -17,6 +17,31 @@ function XAT:getVanity()
 	end
 end
 
+local function findpartial(items, word)
+	for _, s in ipairs(items) do
+		if word:find(s) then
+			return true
+		end
+	end
+	return false
+end
+
+local function hasitem(itemID)
+	local item, found, id
+	for bag = 0, 4 do
+		for slot = 1, GetContainerNumSlots(bag) do
+			item = GetContainerItemLink(bag, slot)
+			if item then
+				found, _, id = item:find('^|c%x+|Hitem:(%d+):.+')
+				if found and tonumber(id) == itemID then
+					return true
+				end
+			end
+		end
+	end
+	return false
+end
+
 function XAT:grabVanity()
 	XAT.grablist = {}
 	local known_spells = {}
@@ -34,22 +59,48 @@ function XAT:grabVanity()
 		["Pet"] = true,
 	}
 
+	local partialchecks = {
+		"Stone of",
+		"Tome of",
+		"Scroll of Defense",
+	}
+
+	local fullchecks = {
+		["Chakra Chug"] = true,
+		["Genius Juice"] = true,
+		["Harm Repellant Remedy"] = true,
+		["Incantation Intensifier"] = true,
+		["Interrupt Rod"] = true,
+		["Long Haul Liquid"] = true,
+		["Manastorm Cleanse"] = true,
+		["Manastorm Curing"] = true,
+		["Manastorm Purification"] = true,
+		["Motion Lotion"] = true,
+		["Muscle Maxer"] = true,
+		["Rage Rush Solution"] = true,
+		["Reflex Booster"] = true,
+		["Sprint Serum"] = true,
+		["Taunting Tonic"] = true,
+		["Tiny Ticking Time-Bomb"] = true,
+	}
+
 	local badItems = {
 		["Alliance"] = {
---			[1780054] = true, -- Stone of Retreat: Razor Hill
+			--			[1780054] = true, -- Stone of Retreat: Razor Hill
 		},
 		["Horde"] = {
---			[1780051] = true, -- Stone of Retreat: Goldshire
+			--			[1780051] = true, -- Stone of Retreat: Goldshire
 		}
 	}
 
 	for k, v in pairs(VANITY_ITEMS) do
 		if C_VanityCollection.IsCollectionItemOwned(k) and v.learnedSpell > 1 then
 			local _, _, _, _, _, _, s = GetItemInfo(v.itemid)
-			if ((v.name:find("Stone of") or v.name:find("Tome of")) and not IsSpellKnown(v.learnedSpell)) or
-			(valid[s] and not known_spells[v.learnedSpell]) then
+			if (((fullchecks[v.name] or findpartial(partialchecks, v.name)) and not IsSpellKnown(v.learnedSpell)) or
+				(valid[s] and not known_spells[v.learnedSpell])) and not hasitem(v.itemid) then
 				if badItems[UnitFactionGroup("player")][v.itemid] then
-					DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": Skipping" .. v.name .. " as it is bugged and gives an unusable item instead of the spell.")
+					DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") ..
+					": Skipping" .. v.name .. " as it is bugged and gives an unusable item instead of the spell.")
 				else
 					table.insert(XAT.grablist, k)
 				end
@@ -58,7 +109,7 @@ function XAT:grabVanity()
 	end
 	if #XAT.grablist > 0 then
 		DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") ..
-		": Grabbing " .. #XAT.grablist .. " unlearned vanity mounts, pets, and stones.")
+			": Grabbing " .. #XAT.grablist .. " unlearned vanity mounts, pets, and stones.")
 		XAT:wait(1, XAT.getVanity, self)
 	end
 end
