@@ -123,7 +123,7 @@ function XAT:grabVanity()
 			local name, rank, known = isManastorm(v)
 			if name then
 				if not mCache[name] or mCache[name].rank < rank then
-					mCache[name] = { ["rank"] = rank, ["known"] = known, ["id"] = k }
+					mCache[name] = { ["rank"] = rank, ["known"] = known, ["id"] = k, ["itemid"] = v.itemid}
 				end
 			elseif ((findpartial(partialchecks, v.name) and not IsSpellKnown(v.learnedSpell)) or
 					(valid[s] and not known_spells[v.learnedSpell])) and not hasitem(v.itemid) then
@@ -137,7 +137,7 @@ function XAT:grabVanity()
 		end
 	end
 	for k, v in pairs(mCache) do
-		if not v.known then
+		if not v.known and not hasitem(v.itemid) then
 			table.insert(XAT.grablist, v.id)
 		end
 	end
