@@ -42,6 +42,32 @@ local function hasitem(itemID)
 	return false
 end
 
+local function isManastorm(v)
+	local manastorm_items = {
+		["Chakra Chug"] = true,
+		["Genius Juice"] = true,
+		["Harm Repellant Remedy"] = true,
+		["Incantation Intensifier"] = true,
+		["Interrupt Rod"] = true,
+		["Long Haul Liquid"] = true,
+		["Manastorm Cleanse"] = true,
+		["Manastorm Curing"] = true,
+		["Manastorm Purification"] = true,
+		["Motion Lotion"] = true,
+		["Muscle Maxer"] = true,
+		["Rage Rush Solution"] = true,
+		["Reflex Booster"] = true,
+		["Sprint Serum"] = true,
+		["Taunting Tonic"] = true,
+		["Tiny Ticking Time-Bomb"] = true,
+	}
+	local name, rank = v.name:match("(.-) %(Rank (.-)%)")
+
+	if name and manastorm_items[name] then
+		return name, tonumber(rank), IsSpellKnown(v.learnedSpell)
+	end
+end
+
 function XAT:grabVanity()
 	XAT.grablist = {}
 	local known_spells = {}
@@ -63,26 +89,22 @@ function XAT:grabVanity()
 		"Stone of",
 		"Tome of",
 		"Scroll of Defense",
-	}
-
-	local fullchecks = {
-		["Chakra Chug"] = true,
-		["Genius Juice"] = true,
-		["Harm Repellant Remedy"] = true,
-		["Incantation Intensifier"] = true,
-		["Interrupt Rod"] = true,
-		["Long Haul Liquid"] = true,
-		["Manastorm Cleanse"] = true,
-		["Manastorm Curing"] = true,
-		["Manastorm Purification"] = true,
-		["Motion Lotion"] = true,
-		["Muscle Maxer"] = true,
-		["Rage Rush Solution"] = true,
-		["Reflex Booster"] = true,
-		["Sprint Serum"] = true,
-		["Taunting Tonic"] = true,
-		["Tiny Ticking Time-Bomb"] = true,
-	}
+		"Chakra Chug",
+		"Genius Juice",
+		"Harm Repellant Remedy",
+		"Incantation Intensifier",
+		"Interrupt Rod",
+		"Long Haul Liquid",
+		"Manastorm Cleanse",
+		"Manastorm Curing",
+		"Manastorm Purification",
+		"Motion Lotion",
+		"Muscle Maxer",
+		"Rage Rush Solution",
+		"Reflex Booster",
+		"Sprint Serum",
+		"Taunting Tonic",
+		"Tiny Ticking Time-Bomb", }
 
 	local badItems = {
 		["Alliance"] = {
@@ -93,18 +115,30 @@ function XAT:grabVanity()
 		}
 	}
 
+	local mCache = {}
 	for k, v in pairs(VANITY_ITEMS) do
 		if C_VanityCollection.IsCollectionItemOwned(k) and v.learnedSpell > 1 then
 			local _, _, _, _, _, _, s = GetItemInfo(v.itemid)
-			if (((fullchecks[v.name] or findpartial(partialchecks, v.name)) and not IsSpellKnown(v.learnedSpell)) or
-				(valid[s] and not known_spells[v.learnedSpell])) and not hasitem(v.itemid) then
+			--			if (((fullchecks[v.name] or findpartial(partialchecks, v.name)) and not IsSpellKnown(v.learnedSpell)) or
+			local name, rank, known = isManastorm(v)
+			if name then
+				if not mCache[name] or mCache[name].rank < rank then
+					mCache[name] = {["rank"] = rank, ["known"] = known, ["id"] = k}
+				end
+			elseif ((findpartial(partialchecks, v.name) and not IsSpellKnown(v.learnedSpell)) or
+					(valid[s] and not known_spells[v.learnedSpell])) and not hasitem(v.itemid) then
 				if badItems[UnitFactionGroup("player")][v.itemid] then
 					DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") ..
-					": Skipping" .. v.name .. " as it is bugged and gives an unusable item instead of the spell.")
+						": Skipping" .. v.name .. " as it is bugged and gives an unusable item instead of the spell.")
 				else
 					table.insert(XAT.grablist, k)
 				end
 			end
+		end
+	end
+	for k,v in pairs(mCache) do
+		if not v.known then
+			table.insert(XAT.grablist, v.id)
 		end
 	end
 	if #XAT.grablist > 0 then
