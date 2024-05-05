@@ -2,9 +2,7 @@
 A simple addon to hide some of the things that Ascension does not let you do by default.  There are several broadcasts that are not hidden, even when disabled in `.chat`
 
 ```
-Use '/xat option` where option can be one of; say, yell, button, trial, altar, autobroadcast, new, ascension, world, coa, bau.
-
-By default:
+Use '/xat option` where option can be one of;
 `say` removed in rest areas
 `yell` removed in rest areas
 `button` is hiding Ascension Button
