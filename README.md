@@ -19,7 +19,7 @@ Use '/xat option` where option can be one of;
 `twitch` is hiding twitch links in Ascension and Newcomers
 `vanity` to automatically grab mounts, pets, and stones of retreat
 
-If you upgrade from a previous version, any new options will be disabled.
+All Options, including new ones, default as disabled.
 ```
 
 ## Install
