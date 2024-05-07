@@ -89,22 +89,7 @@ function XAT:grabVanity()
 		"Stone of",
 		"Tome of",
 		"Scroll of Defense",
-		"Chakra Chug",
-		"Genius Juice",
-		"Harm Repellant Remedy",
-		"Incantation Intensifier",
-		"Interrupt Rod",
-		"Long Haul Liquid",
-		"Manastorm Cleanse",
-		"Manastorm Curing",
-		"Manastorm Purification",
-		"Motion Lotion",
-		"Muscle Maxer",
-		"Rage Rush Solution",
-		"Reflex Booster",
-		"Sprint Serum",
-		"Taunting Tonic",
-		"Tiny Ticking Time-Bomb", }
+	}
 
 	local badItems = {
 		["Alliance"] = {
@@ -123,7 +108,7 @@ function XAT:grabVanity()
 			local name, rank, known = isManastorm(v)
 			if name then
 				if not mCache[name] or mCache[name].rank < rank then
-					mCache[name] = { ["rank"] = rank, ["known"] = known, ["id"] = k, ["itemid"] = v.itemid}
+					mCache[name] = { ["rank"] = rank, ["known"] = known, ["id"] = k, ["itemid"] = v.itemid }
 				end
 			elseif ((findpartial(partialchecks, v.name) and not IsSpellKnown(v.learnedSpell)) or
 					(valid[s] and not known_spells[v.learnedSpell])) and not hasitem(v.itemid) then
