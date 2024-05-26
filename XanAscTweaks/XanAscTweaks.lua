@@ -212,6 +212,12 @@ function XAT:CommandHandler(msg)
 		if XanAscTweaks.autoGrabVanity then
 			XAT:grabVanity()
 		end
+	elseif cmd == "aleader" then
+		XanAscTweaks.filterALeader = toggle(XanAscTweaks.filterALeader, "Alliance Leader Spawn Alerts")
+		filters["|TInterface\\Icons\\inv_alliancewareffort:16|t.-has spawned"] = XanAscTweaks.filterALeader or nil
+	elseif cmd == "hleader" then
+		XanAscTweaks.filterHLeader = toggle(XanAscTweaks.filterHLeader, "Horde Leader Spawn Alerts")
+		filters["|TInterface\\Icons\\inv_hordewareffort:16|t.-has spawned"] = XanAscTweaks.filterHLeader or nil
 	else
 		XAT:printmsg("Use '/xat option` where option can be one of;")
 		local options = {
@@ -229,8 +235,9 @@ function XAT:CommandHandler(msg)
 			status(XanAscTweaks.filterBAUAsc) .. " `bauchat` is hiding BAU from Ascension and Newcomers",
 			status(XanAscTweaks.filterDP) .. " `dp` is hiding messages that contain dp and don't contain dps",
 			status(XanAscTweaks.filterTwitch) .. " `twitch` is hiding twitch links in Ascension and Newcomers",
-			status(XanAscTweaks.autoGrabVanity) ..
-			" `vanity` is automatically grabbing vanity mounts, pets, and stones of retreat.",
+			status(XanAscTweaks.autoGrabVanity) .. " `vanity` is automatically grabbing vanity mounts, pets, and stones of retreat.",
+			status(XanAscTweaks.filterALeader) .. " `aleader` is hiding Alliance Leader spawn alerts.",
+			status(XanAscTweaks.filterHLeader) .. " `hleader` is hiding Horde Leader spawn alerts.",
 		}
 		for _, option in pairs(options) do
 			XAT:printmsg(option, true)
@@ -324,6 +331,8 @@ function XAT.frame:PLAYER_ENTERING_WORLD(event, ...)
 	filters["%[.-Ascension.-Autobroadcast.-%]"] = XanAscTweaks.filterAuto or nil -- Auto Broadcasts
 	filters["%[.-Conquest of Azeroth Travel Guide.-%]"] = XanAscTweaks.filterCOA or nil
 	filters["%[.-Northrend Travel Guide.-%]"] = XanAscTweaks.filterBAU or nil
+	filters["|TInterface\\Icons\\inv_alliancewareffort:16|t.-has spawned"] = XanAscTweaks.filterALeader or nil
+	filters["|TInterface\\Icons\\inv_hordewareffort:16|t.-has spawned"] = XanAscTweaks.filterHLeader or nil
 
 	if XanAscTweaks.autoGrabVanity then
 		XAT:wait(5, XAT.grabVanity, self)
