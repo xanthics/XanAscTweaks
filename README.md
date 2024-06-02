@@ -18,6 +18,8 @@ Use '/xat option` where option can be one of;
 `dp` is hiding messages that contain dp and don't contain dps
 `twitch` is hiding twitch links in Ascension and Newcomers
 `vanity` to automatically grab mounts, pets, and stones of retreat
+`aleader` is hiding Alliance Leader spawn alerts.
+`hleader` is hiding Horde Leader spawn alerts.
 
 All Options, including new ones, default as disabled.
 ```
