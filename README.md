@@ -5,7 +5,6 @@ A simple addon to hide some of the things that Ascension does not let you do by 
 Use '/xat option` where option can be one of;
 `say` removed in rest areas
 `yell` removed in rest areas
-`button` is hiding Ascension Button
 `trial` Broadcasts are being filtered
 `altar` is hiding Mystic Enchanting Altar Broadcasts
 `autobroadcast` messages are being hidden

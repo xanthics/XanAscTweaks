@@ -172,9 +172,6 @@ function XAT:CommandHandler(msg)
 		XanAscTweaks.filtersay = toggle(XanAscTweaks.filtersay, "say")
 	elseif cmd == "yell" then
 		XanAscTweaks.filteryell = toggle(XanAscTweaks.filteryell, "yell")
-	elseif cmd == "button" then
-		XanAscTweaks.hideAscButton = toggle(XanAscTweaks.hideAscButton, "button")
-		reload = true
 	elseif cmd == "trial" then
 		XanAscTweaks.filtertrial = toggle(XanAscTweaks.filtertrial, "trial")
 		filters["Htrial:%d-:"] = XanAscTweaks.filtertrial or nil -- Trials
@@ -223,7 +220,6 @@ function XAT:CommandHandler(msg)
 		local options = {
 			status(XanAscTweaks.filtersay) .. " `say` removed in rest areas",
 			status(XanAscTweaks.filteryell) .. " `yell` removed in rest areas",
-			status(XanAscTweaks.hideAscButton) .. " `button` is hiding Ascension Button",
 			status(XanAscTweaks.filtertrial) .. " `trial` Broadcasts are being filtered",
 			status(XanAscTweaks.filterMEA) .. " `altar` is hiding Mystic Enchanting Altar Broadcasts",
 			status(XanAscTweaks.filterAuto) .. " `autobroadcast` messages are being hidden",
@@ -336,10 +332,6 @@ function XAT.frame:PLAYER_ENTERING_WORLD(event, ...)
 
 	if XanAscTweaks.autoGrabVanity then
 		XAT:wait(5, XAT.grabVanity, self)
-	end
-
-	if XanAscTweaks.hideAscButton then
-		LibDBIcon10_AscensionUICA2:Hide()
 	end
 
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", filterSystem)
