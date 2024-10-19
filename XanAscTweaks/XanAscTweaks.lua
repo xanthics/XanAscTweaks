@@ -203,6 +203,12 @@ function XAT:CommandHandler(msg)
 		filters["%[.-Northrend Travel Guide.-%]"] = XanAscTweaks.filterBAU or nil
 	elseif cmd == "bauchat" then
 		XanAscTweaks.filterBAUAsc = toggle(XanAscTweaks.filterBAUAsc, "bau in chat")
+	elseif cmd == "keeper" then
+		XanAscTweaks.filterKeeper = toggle(XanAscTweaks.filterKeeper, "Keeper's Scroll")
+		filters["%[.-Keeper's.-Scroll.-%]"] = XanAscTweaks.filterKeeper or nil
+	elseif cmd == "motherlode" then
+		XanAscTweaks.filterMotherlode = toggle(XanAscTweaks.filterMotherlode, "The Motherlode")
+		filters["%[.-The.-Motherlode.-%]"] = XanAscTweaks.filterMotherlode or nil
 	elseif cmd == "dp" then
 		XanAscTweaks.filterDP = toggle(XanAscTweaks.filterDP, "dp in chat")
 	elseif cmd == "twitch" then
@@ -233,6 +239,8 @@ function XAT:CommandHandler(msg)
 			status(XanAscTweaks.filterCOA) .. " `coa` is filtering Conquest of Azeroth Travel Guide",
 			status(XanAscTweaks.filterBAU) .. " `bau` is filtering Northrend Travel Guide",
 			status(XanAscTweaks.filterBAUAsc) .. " `bauchat` is hiding BAU from Ascension and Newcomers",
+			status(XanAscTweaks.filterKeeper) .. " `keeper` is filtering Keeper's Scrolls",
+			status(XanAscTweaks.filterMotherlode) .. " `motherlode` is filtering Motherlodes",
 			status(XanAscTweaks.filterDP) .. " `dp` is hiding messages that contain dp and don't contain dps",
 			status(XanAscTweaks.filterTwitch) .. " `twitch` is hiding twitch links in Ascension and Newcomers",
 			status(XanAscTweaks.autoGrabVanity) .. " `vanity` is automatically grabbing vanity mounts, pets, and stones of retreat.",
@@ -331,6 +339,8 @@ function XAT.frame:PLAYER_ENTERING_WORLD(event, ...)
 	filters["%[.-Ascension.-Autobroadcast.-%]"] = XanAscTweaks.filterAuto or nil -- Auto Broadcasts
 	filters["%[.-Conquest of Azeroth Travel Guide.-%]"] = XanAscTweaks.filterCOA or nil
 	filters["%[.-Northrend Travel Guide.-%]"] = XanAscTweaks.filterBAU or nil
+	filters["%[.-Keeper's.-Scroll.-%]"] = XanAscTweaks.filterKeeper or nil
+	filters["%[.-The.-Motherlode.-%]"] = XanAscTweaks.filterMotherlode or nil
 	filters["|TInterface\\Icons\\inv_alliancewareffort:16|t.-has spawned"] = XanAscTweaks.filterALeader or nil
 	filters["|TInterface\\Icons\\inv_hordewareffort:16|t.-has spawned"] = XanAscTweaks.filterHLeader or nil
 
