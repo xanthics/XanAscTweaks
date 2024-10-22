@@ -284,7 +284,7 @@ end
 
 -- filter system messages to remove various unwanted messages
 local function filterSystem(self, event, msg, ...)
-	if event ~= "CHAT_MSG_SYSTEM" or not msg then return false end
+	if (event ~= "CHAT_MSG_SYSTEM" and event ~= "CHAT_MSG_EMOTE") or not msg then return false end
 
 	for filter, _ in pairs(filters) do
 		if msg:find(filter) then
@@ -355,6 +355,7 @@ function XAT.frame:PLAYER_ENTERING_WORLD(event, ...)
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", filterSystem)
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", filterAll)
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", filterAll)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", filterSystem)
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", filterChannel)
 
 	XAT:wait(1, XAT.hideNew, self)
