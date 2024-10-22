@@ -182,7 +182,13 @@ function XAT:CommandHandler(msg)
 		filters["%[.-Nightmare.-%]"] = XanAscTweaks.filtertrial or nil
 	elseif cmd == "altar" then
 		XanAscTweaks.filterMEA = toggle(XanAscTweaks.filterMEA, "altar")
-		filters["Hitem:1179126"] = XanAscTweaks.filterMEA or nil -- Mystic Enchanting Altar
+    filters["Hitem:406"] = XanAscTweaks.filterMEA or nil     -- Felforged Enchanting Altar
+		filters["Hitem:1179126"] = XanAscTweaks.filterMEA or nil -- Keeper's Scroll: Ancient Enchanting Altar
+    filters["Hitem:1903513"] = XanAscTweaks.filterMEA or nil -- Mystic Enchanting Altar
+    filters["Hitem:1903514"] = XanAscTweaks.filterMEA or nil -- Volatile Mystic Enchanting Altar
+    filters["Hitem:2200025"] = XanAscTweaks.filterMEA or nil -- Soulbound Keeper's Scroll: Ancient Enchanting Altar
+    filters["Hitem:8210192"] = XanAscTweaks.filterMEA or nil -- Build Master’s Mystic Enchanting Altar
+    filters["Hitem:8210197"] = XanAscTweaks.filterMEA or nil -- Destined Mystic Enchanting Altar
 	elseif cmd == "autobroadcast" then
 		XanAscTweaks.filterAuto = toggle(XanAscTweaks.filterAuto, "autobroadcast")
 		filters["%[.-Ascension.-Autobroadcast.-%]"] = XanAscTweaks.filterAuto or nil -- Auto Broadcasts
@@ -335,7 +341,13 @@ function XAT.frame:PLAYER_ENTERING_WORLD(event, ...)
 	filters["Htrial:%d-:"] = XanAscTweaks.filtertrial or nil -- Trials
 	filters["%[.-Resolute.-Mode.-%]"] = XanAscTweaks.filtertrial or nil
 	filters["%[.-Nightmare.-%]"] = XanAscTweaks.filtertrial or nil
-	filters["Hitem:1179126"] = XanAscTweaks.filterMEA or nil                  -- Mystic Enchanting Altar
+  filters["Hitem:406"] = XanAscTweaks.filterMEA or nil     -- Felforged Enchanting Altar
+  filters["Hitem:1179126"] = XanAscTweaks.filterMEA or nil -- Keeper's Scroll: Ancient Enchanting Altar
+  filters["Hitem:1903513"] = XanAscTweaks.filterMEA or nil -- Mystic Enchanting Altar
+  filters["Hitem:1903514"] = XanAscTweaks.filterMEA or nil -- Volatile Mystic Enchanting Altar
+  filters["Hitem:2200025"] = XanAscTweaks.filterMEA or nil -- Soulbound Keeper's Scroll: Ancient Enchanting Altar
+  filters["Hitem:8210192"] = XanAscTweaks.filterMEA or nil -- Build Master’s Mystic Enchanting Altar
+  filters["Hitem:8210197"] = XanAscTweaks.filterMEA or nil -- Destined Mystic Enchanting Altar
 	filters["%[.-Ascension.-Autobroadcast.-%]"] = XanAscTweaks.filterAuto or nil -- Auto Broadcasts
 	filters["%[.-Conquest of Azeroth Travel Guide.-%]"] = XanAscTweaks.filterCOA or nil
 	filters["%[.-Northrend Travel Guide.-%]"] = XanAscTweaks.filterBAU or nil
