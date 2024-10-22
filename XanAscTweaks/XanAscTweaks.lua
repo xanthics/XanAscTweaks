@@ -187,6 +187,7 @@ function XAT:CommandHandler(msg)
     filters["Hitem:1903513"] = XanAscTweaks.filterMEA or nil -- Mystic Enchanting Altar
     filters["Hitem:1903514"] = XanAscTweaks.filterMEA or nil -- Volatile Mystic Enchanting Altar
     filters["Hitem:2200025"] = XanAscTweaks.filterMEA or nil -- Soulbound Keeper's Scroll: Ancient Enchanting Altar
+		filters["Hitem:2903513"] = XanAscTweaks.filterMEA or nil -- Mechanical Mystic Altar
     filters["Hitem:8210192"] = XanAscTweaks.filterMEA or nil -- Build Master’s Mystic Enchanting Altar
     filters["Hitem:8210197"] = XanAscTweaks.filterMEA or nil -- Destined Mystic Enchanting Altar
 	elseif cmd == "autobroadcast" then
@@ -346,6 +347,7 @@ function XAT.frame:PLAYER_ENTERING_WORLD(event, ...)
   filters["Hitem:1903513"] = XanAscTweaks.filterMEA or nil -- Mystic Enchanting Altar
   filters["Hitem:1903514"] = XanAscTweaks.filterMEA or nil -- Volatile Mystic Enchanting Altar
   filters["Hitem:2200025"] = XanAscTweaks.filterMEA or nil -- Soulbound Keeper's Scroll: Ancient Enchanting Altar
+	filters["Hitem:2903513"] = XanAscTweaks.filterMEA or nil -- Mechanical Mystic Altar
   filters["Hitem:8210192"] = XanAscTweaks.filterMEA or nil -- Build Master’s Mystic Enchanting Altar
   filters["Hitem:8210197"] = XanAscTweaks.filterMEA or nil -- Destined Mystic Enchanting Altar
 	filters["%[.-Ascension.-Autobroadcast.-%]"] = XanAscTweaks.filterAuto or nil -- Auto Broadcasts
