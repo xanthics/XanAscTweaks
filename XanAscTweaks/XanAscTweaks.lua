@@ -170,8 +170,10 @@ function XAT:CommandHandler(msg)
 	local _, _, cmd, args = string.find(msg, "%s?(%w+)%s?(.*)")
 	if cmd == "say" then
 		XanAscTweaks.filtersay = toggle(XanAscTweaks.filtersay, "say")
+		reload = true
 	elseif cmd == "yell" then
 		XanAscTweaks.filteryell = toggle(XanAscTweaks.filteryell, "yell")
+		reload = true
 	elseif cmd == "button" then
 		XanAscTweaks.hideAscButton = toggle(XanAscTweaks.hideAscButton, "button")
 		reload = true
@@ -180,9 +182,11 @@ function XAT:CommandHandler(msg)
 		filters["Htrial:%d-:"] = XanAscTweaks.filtertrial or nil -- Trials
 		filters["%[.-Resolute.-Mode.-%]"] = XanAscTweaks.filtertrial or nil
 		filters["%[.-Nightmare.-%]"] = XanAscTweaks.filtertrial or nil
+		reload = true
 	elseif cmd == "altar" then
 		XanAscTweaks.filterMEA = toggle(XanAscTweaks.filterMEA, "altar")
 		filters["Hitem:1179126"] = XanAscTweaks.filterMEA or nil -- Mystic Enchanting Altar
+		reload = true
 	elseif cmd == "autobroadcast" then
 		XanAscTweaks.filterAuto = toggle(XanAscTweaks.filterAuto, "autobroadcast")
 		filters["%[.-Ascension.-Autobroadcast.-%]"] = XanAscTweaks.filterAuto or nil -- Auto Broadcasts
@@ -203,6 +207,7 @@ function XAT:CommandHandler(msg)
 		filters["%[.-Northrend Travel Guide.-%]"] = XanAscTweaks.filterBAU or nil
 	elseif cmd == "bauchat" then
 		XanAscTweaks.filterBAUAsc = toggle(XanAscTweaks.filterBAUAsc, "bau in chat")
+		reload = true
 	elseif cmd == "keeper" then
 		XanAscTweaks.filterKeeper = toggle(XanAscTweaks.filterKeeper, "Keeper's Scroll")
 		filters["%[.-Keeper's.-Scroll.-%]"] = XanAscTweaks.filterKeeper or nil
@@ -284,8 +289,7 @@ end
 
 -- filter system messages to remove various unwanted messages
 local function filterSystem(self, event, msg, ...)
-	if (event ~= "CHAT_MSG_SYSTEM" and event ~= "CHAT_MSG_EMOTE") or not msg then return false end
-
+	if event ~= "CHAT_MSG_SYSTEM" or not msg then return false end
 	for filter, _ in pairs(filters) do
 		if msg:find(filter) then
 			-- match found, suppress the message
@@ -294,6 +298,13 @@ local function filterSystem(self, event, msg, ...)
 	end
 	-- did not match a filter
 	return false
+end
+
+-- filter system messages to remove various unwanted messages
+local function filterEmote(self, event, msg, ...)
+	if event ~= "CHAT_MSG_EMOTE" or not msg then return false end
+	return XanAscTweaks.filterMEA and msg:find("Use this to empower your character with powerful enchants")
+
 end
 
 -- remove BAU and DP from newcomers and ascension
@@ -355,7 +366,7 @@ function XAT.frame:PLAYER_ENTERING_WORLD(event, ...)
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", filterSystem)
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", filterAll)
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", filterAll)
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", filterSystem)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", filterEmote)
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", filterChannel)
 
 	XAT:wait(1, XAT.hideNew, self)
