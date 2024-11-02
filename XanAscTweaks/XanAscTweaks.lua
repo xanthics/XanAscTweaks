@@ -170,16 +170,23 @@ function XAT:CommandHandler(msg)
 	local _, _, cmd, args = string.find(msg, "%s?(%w+)%s?(.*)")
 	if cmd == "say" then
 		XanAscTweaks.filtersay = toggle(XanAscTweaks.filtersay, "say")
+		reload = true
 	elseif cmd == "yell" then
 		XanAscTweaks.filteryell = toggle(XanAscTweaks.filteryell, "yell")
+		reload = true
+	elseif cmd == "button" then
+		XanAscTweaks.hideAscButton = toggle(XanAscTweaks.hideAscButton, "button")
+		reload = true
 	elseif cmd == "trial" then
 		XanAscTweaks.filtertrial = toggle(XanAscTweaks.filtertrial, "trial")
 		filters["Htrial:%d-:"] = XanAscTweaks.filtertrial or nil -- Trials
 		filters["%[.-Resolute.-Mode.-%]"] = XanAscTweaks.filtertrial or nil
 		filters["%[.-Nightmare.-%]"] = XanAscTweaks.filtertrial or nil
+		reload = true
 	elseif cmd == "altar" then
 		XanAscTweaks.filterMEA = toggle(XanAscTweaks.filterMEA, "altar")
 		filters["Hitem:1179126"] = XanAscTweaks.filterMEA or nil -- Mystic Enchanting Altar
+		reload = true
 	elseif cmd == "autobroadcast" then
 		XanAscTweaks.filterAuto = toggle(XanAscTweaks.filterAuto, "autobroadcast")
 		filters["%[.-Ascension.-Autobroadcast.-%]"] = XanAscTweaks.filterAuto or nil -- Auto Broadcasts
@@ -200,6 +207,13 @@ function XAT:CommandHandler(msg)
 		filters["%[.-Northrend Travel Guide.-%]"] = XanAscTweaks.filterBAU or nil
 	elseif cmd == "bauchat" then
 		XanAscTweaks.filterBAUAsc = toggle(XanAscTweaks.filterBAUAsc, "bau in chat")
+		reload = true
+	elseif cmd == "keeper" then
+		XanAscTweaks.filterKeeper = toggle(XanAscTweaks.filterKeeper, "Keeper's Scroll")
+		filters["%[.-Keeper's.-Scroll.-%]"] = XanAscTweaks.filterKeeper or nil
+	elseif cmd == "motherlode" then
+		XanAscTweaks.filterMotherlode = toggle(XanAscTweaks.filterMotherlode, "The Motherlode")
+		filters["%[.-The.-Motherlode.-%]"] = XanAscTweaks.filterMotherlode or nil
 	elseif cmd == "dp" then
 		XanAscTweaks.filterDP = toggle(XanAscTweaks.filterDP, "dp in chat")
 	elseif cmd == "twitch" then
@@ -220,6 +234,7 @@ function XAT:CommandHandler(msg)
 		local options = {
 			status(XanAscTweaks.filtersay) .. " `say` removed in rest areas",
 			status(XanAscTweaks.filteryell) .. " `yell` removed in rest areas",
+			status(XanAscTweaks.hideAscButton) .. " `button` is hiding Ascension Button",
 			status(XanAscTweaks.filtertrial) .. " `trial` Broadcasts are being filtered",
 			status(XanAscTweaks.filterMEA) .. " `altar` is hiding Mystic Enchanting Altar Broadcasts",
 			status(XanAscTweaks.filterAuto) .. " `autobroadcast` messages are being hidden",
@@ -229,6 +244,8 @@ function XAT:CommandHandler(msg)
 			status(XanAscTweaks.filterCOA) .. " `coa` is filtering Conquest of Azeroth Travel Guide",
 			status(XanAscTweaks.filterBAU) .. " `bau` is filtering Northrend Travel Guide",
 			status(XanAscTweaks.filterBAUAsc) .. " `bauchat` is hiding BAU from Ascension and Newcomers",
+			status(XanAscTweaks.filterKeeper) .. " `keeper` is filtering Keeper's Scrolls",
+			status(XanAscTweaks.filterMotherlode) .. " `motherlode` is filtering Motherlodes",
 			status(XanAscTweaks.filterDP) .. " `dp` is hiding messages that contain dp and don't contain dps",
 			status(XanAscTweaks.filterTwitch) .. " `twitch` is hiding twitch links in Ascension and Newcomers",
 			status(XanAscTweaks.autoGrabVanity) .. " `vanity` is automatically grabbing vanity mounts, pets, and stones of retreat.",
@@ -273,7 +290,6 @@ end
 -- filter system messages to remove various unwanted messages
 local function filterSystem(self, event, msg, ...)
 	if event ~= "CHAT_MSG_SYSTEM" or not msg then return false end
-
 	for filter, _ in pairs(filters) do
 		if msg:find(filter) then
 			-- match found, suppress the message
@@ -282,6 +298,13 @@ local function filterSystem(self, event, msg, ...)
 	end
 	-- did not match a filter
 	return false
+end
+
+-- filter system messages to remove various unwanted messages
+local function filterEmote(self, event, msg, ...)
+	if event ~= "CHAT_MSG_EMOTE" or not msg then return false end
+	return XanAscTweaks.filterMEA and msg:find("Use this to empower your character with powerful enchants")
+
 end
 
 -- remove BAU and DP from newcomers and ascension
@@ -327,6 +350,8 @@ function XAT.frame:PLAYER_ENTERING_WORLD(event, ...)
 	filters["%[.-Ascension.-Autobroadcast.-%]"] = XanAscTweaks.filterAuto or nil -- Auto Broadcasts
 	filters["%[.-Conquest of Azeroth Travel Guide.-%]"] = XanAscTweaks.filterCOA or nil
 	filters["%[.-Northrend Travel Guide.-%]"] = XanAscTweaks.filterBAU or nil
+	filters["%[.-Keeper's.-Scroll.-%]"] = XanAscTweaks.filterKeeper or nil
+	filters["%[.-The.-Motherlode.-%]"] = XanAscTweaks.filterMotherlode or nil
 	filters["|TInterface\\Icons\\inv_alliancewareffort:16|t.-has spawned"] = XanAscTweaks.filterALeader or nil
 	filters["|TInterface\\Icons\\inv_hordewareffort:16|t.-has spawned"] = XanAscTweaks.filterHLeader or nil
 
@@ -334,9 +359,14 @@ function XAT.frame:PLAYER_ENTERING_WORLD(event, ...)
 		XAT:wait(5, XAT.grabVanity, self)
 	end
 
+	if XanAscTweaks.hideAscButton then
+		LibDBIcon10_AscensionUICA2:Hide()
+	end
+
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", filterSystem)
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", filterAll)
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", filterAll)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", filterEmote)
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", filterChannel)
 
 	XAT:wait(1, XAT.hideNew, self)

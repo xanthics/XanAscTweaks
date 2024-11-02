@@ -5,6 +5,7 @@ A simple addon to hide some of the things that Ascension does not let you do by 
 Use '/xat option` where option can be one of;
 `say` removed in rest areas
 `yell` removed in rest areas
+`button` is hiding Ascension Button
 `trial` Broadcasts are being filtered
 `altar` is hiding Mystic Enchanting Altar Broadcasts
 `autobroadcast` messages are being hidden
@@ -14,6 +15,8 @@ Use '/xat option` where option can be one of;
 `coa` is filtering Conquest of Azeroth Travel Guide
 `bau` is filtering Northrend Travel Guide
 `bauchat` is hiding BAU from Ascension and Newcomers
+`keeper` is filtering Keeper's Scrolls
+`motherlode` is filtering Motherlodes
 `dp` is hiding messages that contain dp and don't contain dps
 `twitch` is hiding twitch links in Ascension and Newcomers
 `vanity` to automatically grab mounts, pets, and stones of retreat
