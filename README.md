@@ -19,7 +19,7 @@ Use '/xat option` where option can be one of;
 `motherlode` is filtering Motherlodes
 `dp` is hiding messages that contain dp and don't contain dps
 `twitch` is hiding twitch links in Ascension and Newcomers
-`vanity` to automatically grab mounts, pets, and stones of retreat
+`vanity` to automatically grab unlearned vanity spells
 `aleader` is hiding Alliance Leader spawn alerts.
 `hleader` is hiding Horde Leader spawn alerts.
 

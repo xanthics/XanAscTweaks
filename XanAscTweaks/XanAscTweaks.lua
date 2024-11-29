@@ -60,12 +60,19 @@ local function isManastorm(v)
 		["Sprint Serum"] = true,
 		["Taunting Tonic"] = true,
 		["Tiny Ticking Time-Bomb"] = true,
+		["Hearty Heal Upgrade"] = true,
+		["Cleanse"] = true,
+		["Purification"] = true,
 	}
 	local name, rank = v.name:match("(.-) %(Rank (.-)%)")
 
 	if name and manastorm_items[name] then
 		return name, tonumber(rank), IsSpellKnown(v.learnedSpell)
 	end
+end
+
+local function isMillhouseUpgrade(v)
+
 end
 
 function XAT:grabVanity()
@@ -80,17 +87,6 @@ function XAT:grabVanity()
 		known_spells[sID] = true
 	end
 
-	local valid = {
-		["Mount"] = true,
-		["Pet"] = true,
-	}
-
-	local partialchecks = {
-		"Stone of",
-		"Tome of",
-		"Scroll of Defense",
-	}
-
 	local badItems = {
 		["Alliance"] = {
 			--			[1780054] = true, -- Stone of Retreat: Razor Hill
@@ -101,6 +97,9 @@ function XAT:grabVanity()
 	}
 
 	local mCache = {}
+	local mmm = {}
+	local max_mmm = 0
+	local known_mmm = 0
 	for k, v in pairs(VANITY_ITEMS) do
 		if C_VanityCollection.IsCollectionItemOwned(k) and v.learnedSpell > 1 then
 			local _, _, _, _, _, _, s = GetItemInfo(v.itemid)
@@ -110,8 +109,14 @@ function XAT:grabVanity()
 				if not mCache[name] or mCache[name].rank < rank then
 					mCache[name] = { ["rank"] = rank, ["known"] = known, ["id"] = k, ["itemid"] = v.itemid }
 				end
-			elseif ((findpartial(partialchecks, v.name) and not IsSpellKnown(v.learnedSpell)) or
-					(valid[s] and not known_spells[v.learnedSpell])) and not hasitem(v.itemid) then
+			elseif v.name:find("Millhouse Mobility Mixture %(Upgrade") then
+				local rank = tonumber(v.name:match("Millhouse Mobility Mixture %(Upgrade Rank (%d+)"))
+				if rank > max_mmm then max_mmm = rank end
+				if IsSpellKnown(v.learnedSpell) then known_mmm = rank end
+				mmm[rank] = { ["id"] = k, ["itemid"] = v.itemid }
+				print(rank, known_mmm, max_mmm, v.name)
+
+			elseif not (IsSpellKnown(v.learnedSpell) or known_spells[v.learnedSpell]) and not hasitem(v.itemid) then
 				if badItems[UnitFactionGroup("player")][v.itemid] then
 					DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") ..
 						": Skipping" .. v.name .. " as it is bugged and gives an unusable item instead of the spell.")
@@ -126,9 +131,14 @@ function XAT:grabVanity()
 			table.insert(XAT.grablist, v.id)
 		end
 	end
+	for i = known_mmm + 1, max_mmm do
+		if not hasitem(mmm[i].itemid) then
+			table.insert(XAT.grablist, mmm[i].id)
+		end
+	end
 	if #XAT.grablist > 0 then
 		DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") ..
-			": Grabbing " .. #XAT.grablist .. " unlearned vanity mounts, pets, and stones.")
+			": Grabbing " .. #XAT.grablist .. " unlearned vanity spells.")
 		XAT:wait(1, XAT.getVanity, self)
 	end
 end
@@ -248,7 +258,7 @@ function XAT:CommandHandler(msg)
 			status(XanAscTweaks.filterMotherlode) .. " `motherlode` is filtering Motherlodes",
 			status(XanAscTweaks.filterDP) .. " `dp` is hiding messages that contain dp and don't contain dps",
 			status(XanAscTweaks.filterTwitch) .. " `twitch` is hiding twitch links in Ascension and Newcomers",
-			status(XanAscTweaks.autoGrabVanity) .. " `vanity` is automatically grabbing vanity mounts, pets, and stones of retreat.",
+			status(XanAscTweaks.autoGrabVanity) .. " `vanity` is automatically grabbing unlearned vanity spells.",
 			status(XanAscTweaks.filterALeader) .. " `aleader` is hiding Alliance Leader spawn alerts.",
 			status(XanAscTweaks.filterHLeader) .. " `hleader` is hiding Horde Leader spawn alerts.",
 		}
@@ -304,7 +314,6 @@ end
 local function filterEmote(self, event, msg, ...)
 	if event ~= "CHAT_MSG_EMOTE" or not msg then return false end
 	return XanAscTweaks.filterMEA and msg:find("Use this to empower your character with powerful enchants")
-
 end
 
 -- remove BAU and DP from newcomers and ascension
