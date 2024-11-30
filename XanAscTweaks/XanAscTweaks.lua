@@ -71,10 +71,6 @@ local function isManastorm(v)
 	end
 end
 
-local function isMillhouseUpgrade(v)
-
-end
-
 function XAT:grabVanity()
 	XAT.grablist = {}
 	local known_spells = {}
@@ -176,7 +172,20 @@ end
 -- handle slash commands
 function XAT:CommandHandler(msg)
 	local _, _, cmd, args = string.find(msg, "%s?(%w+)%s?(.*)")
-	if cmd == "say" then
+	if cmd == "all" and args then
+		if args == "on" then
+			local opttext = { "filtersay", "filteryell", "hideAscButton", "filtertrial", "filterMEA", "filterAuto", "filterNew", "filterAscension", "filterWorld", "filterCOA", "filterBAU", "filterBAUAsc", "filterKeeper", "filterMotherlode", "filterDP", "filterTwitch", "autoGrabVanity", "filterALeader", "filterHLeader" }
+			for _, v in ipairs(opttext) do
+				XanAscTweaks[v] = true
+			end
+			reload = true
+		elseif args == "off" then
+			XanAscTweaks = {}
+			reload = true
+		else
+			XAT:printmsg("Invalid option.  'on' or 'off'")
+		end
+	elseif cmd == "say" then
 		XanAscTweaks.filtersay = toggle(XanAscTweaks.filtersay, "say")
 		reload = true
 	elseif cmd == "yell" then
@@ -187,17 +196,13 @@ function XAT:CommandHandler(msg)
 		reload = true
 	elseif cmd == "trial" then
 		XanAscTweaks.filtertrial = toggle(XanAscTweaks.filtertrial, "trial")
-		filters["Htrial:%d-:"] = XanAscTweaks.filtertrial or nil -- Trials
-		filters["%[.-Resolute.-Mode.-%]"] = XanAscTweaks.filtertrial or nil
-		filters["%[.-Nightmare.-%]"] = XanAscTweaks.filtertrial or nil
 		reload = true
 	elseif cmd == "altar" then
 		XanAscTweaks.filterMEA = toggle(XanAscTweaks.filterMEA, "altar")
-		filters["Hitem:1179126"] = XanAscTweaks.filterMEA or nil -- Mystic Enchanting Altar
 		reload = true
 	elseif cmd == "autobroadcast" then
 		XanAscTweaks.filterAuto = toggle(XanAscTweaks.filterAuto, "autobroadcast")
-		filters["%[.-Ascension.-Autobroadcast.-%]"] = XanAscTweaks.filterAuto or nil -- Auto Broadcasts
+		reload = true
 	elseif cmd == "new" then
 		XanAscTweaks.filterNew = toggle(XanAscTweaks.filterNew, "Newcomers chat")
 		reload = true
@@ -209,23 +214,25 @@ function XAT:CommandHandler(msg)
 		reload = true
 	elseif cmd == "coa" then
 		XanAscTweaks.filterCOA = toggle(XanAscTweaks.filterCOA, "Conquest of Azeroth Travel Guide")
-		filters["%[.-Conquest of Azeroth Travel Guide.-%]"] = XanAscTweaks.filterCOA or nil
+		reload = true
 	elseif cmd == "bau" then
 		XanAscTweaks.filterBAU = toggle(XanAscTweaks.filterBAU, "Northrend Travel Guide")
-		filters["%[.-Northrend Travel Guide.-%]"] = XanAscTweaks.filterBAU or nil
+		reload = true
 	elseif cmd == "bauchat" then
 		XanAscTweaks.filterBAUAsc = toggle(XanAscTweaks.filterBAUAsc, "bau in chat")
 		reload = true
 	elseif cmd == "keeper" then
 		XanAscTweaks.filterKeeper = toggle(XanAscTweaks.filterKeeper, "Keeper's Scroll")
-		filters["%[.-Keeper's.-Scroll.-%]"] = XanAscTweaks.filterKeeper or nil
+		reload = true
 	elseif cmd == "motherlode" then
 		XanAscTweaks.filterMotherlode = toggle(XanAscTweaks.filterMotherlode, "The Motherlode")
-		filters["%[.-The.-Motherlode.-%]"] = XanAscTweaks.filterMotherlode or nil
+		reload = true
 	elseif cmd == "dp" then
 		XanAscTweaks.filterDP = toggle(XanAscTweaks.filterDP, "dp in chat")
+		reload = true
 	elseif cmd == "twitch" then
 		XanAscTweaks.filterTwitch = toggle(XanAscTweaks.filterTwitch, "Twitch in chat")
+		reload = true
 	elseif cmd == "vanity" then
 		XanAscTweaks.autoGrabVanity = toggle(XanAscTweaks.autoGrabVanity, "Auto-grab Vanity")
 		if XanAscTweaks.autoGrabVanity then
@@ -233,12 +240,12 @@ function XAT:CommandHandler(msg)
 		end
 	elseif cmd == "aleader" then
 		XanAscTweaks.filterALeader = toggle(XanAscTweaks.filterALeader, "Alliance Leader Spawn Alerts")
-		filters["|TInterface\\Icons\\inv_alliancewareffort:16|t.-has spawned"] = XanAscTweaks.filterALeader or nil
+		reload = true
 	elseif cmd == "hleader" then
 		XanAscTweaks.filterHLeader = toggle(XanAscTweaks.filterHLeader, "Horde Leader Spawn Alerts")
-		filters["|TInterface\\Icons\\inv_hordewareffort:16|t.-has spawned"] = XanAscTweaks.filterHLeader or nil
+		reload = true
 	else
-		XAT:printmsg("Use '/xat option` where option can be one of;")
+		XAT:printmsg("Use '/xat all on|off' to quickly toggle all options.  Or use '/xat option` where option can be one of;")
 		local options = {
 			status(XanAscTweaks.filtersay) .. " `say` removed in rest areas",
 			status(XanAscTweaks.filteryell) .. " `yell` removed in rest areas",
