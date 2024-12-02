@@ -108,7 +108,7 @@ function XAT:grabVanity()
 			elseif v.name:find("Millhouse Mobility Mixture %(Upgrade") then
 				local rank = tonumber(v.name:match("Millhouse Mobility Mixture %(Upgrade Rank (%d+)"))
 				if rank > max_mmm then max_mmm = rank end
-				if IsSpellKnown(v.learnedSpell) then known_mmm = rank end
+				if IsSpellKnown(v.learnedSpell) and rank > known_mmm then known_mmm = rank end
 				mmm[rank] = { ["id"] = k, ["itemid"] = v.itemid }
 			elseif not (IsSpellKnown(v.learnedSpell) or known_spells[v.learnedSpell]) and not hasitem(v.itemid) then
 				if badItems[UnitFactionGroup("player")][v.itemid] then
