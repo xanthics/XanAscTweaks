@@ -60,6 +60,9 @@ local function isManastorm(v)
 		["Sprint Serum"] = true,
 		["Taunting Tonic"] = true,
 		["Tiny Ticking Time-Bomb"] = true,
+		["Hearty Heal Upgrade"] = true,
+		["Cleanse"] = true,
+		["Purification"] = true,
 	}
 	local name, rank = v.name:match("(.-) %(Rank (.-)%)")
 
@@ -80,17 +83,6 @@ function XAT:grabVanity()
 		known_spells[sID] = true
 	end
 
-	local valid = {
-		["Mount"] = true,
-		["Pet"] = true,
-	}
-
-	local partialchecks = {
-		"Stone of",
-		"Tome of",
-		"Scroll of Defense",
-	}
-
 	local badItems = {
 		["Alliance"] = {
 			--			[1780054] = true, -- Stone of Retreat: Razor Hill
@@ -101,6 +93,9 @@ function XAT:grabVanity()
 	}
 
 	local mCache = {}
+	local mmm = {}
+	local max_mmm = 0
+	local known_mmm = 0
 	for k, v in pairs(VANITY_ITEMS) do
 		if C_VanityCollection.IsCollectionItemOwned(k) and v.learnedSpell > 1 then
 			local _, _, _, _, _, _, s = GetItemInfo(v.itemid)
@@ -110,8 +105,12 @@ function XAT:grabVanity()
 				if not mCache[name] or mCache[name].rank < rank then
 					mCache[name] = { ["rank"] = rank, ["known"] = known, ["id"] = k, ["itemid"] = v.itemid }
 				end
-			elseif ((findpartial(partialchecks, v.name) and not IsSpellKnown(v.learnedSpell)) or
-					(valid[s] and not known_spells[v.learnedSpell])) and not hasitem(v.itemid) then
+			elseif v.name:find("Millhouse Mobility Mixture %(Upgrade") then
+				local rank = tonumber(v.name:match("Millhouse Mobility Mixture %(Upgrade Rank (%d+)"))
+				if rank > max_mmm then max_mmm = rank end
+				if IsSpellKnown(v.learnedSpell) then known_mmm = rank end
+				mmm[rank] = { ["id"] = k, ["itemid"] = v.itemid }
+			elseif not (IsSpellKnown(v.learnedSpell) or known_spells[v.learnedSpell]) and not hasitem(v.itemid) then
 				if badItems[UnitFactionGroup("player")][v.itemid] then
 					DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") ..
 						": Skipping" .. v.name .. " as it is bugged and gives an unusable item instead of the spell.")
@@ -126,9 +125,14 @@ function XAT:grabVanity()
 			table.insert(XAT.grablist, v.id)
 		end
 	end
+	for i = known_mmm + 1, max_mmm do
+		if not hasitem(mmm[i].itemid) then
+			table.insert(XAT.grablist, mmm[i].id)
+		end
+	end
 	if #XAT.grablist > 0 then
 		DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") ..
-			": Grabbing " .. #XAT.grablist .. " unlearned vanity mounts, pets, and stones.")
+			": Grabbing " .. #XAT.grablist .. " unlearned vanity spells.")
 		XAT:wait(1, XAT.getVanity, self)
 	end
 end
@@ -168,7 +172,20 @@ end
 -- handle slash commands
 function XAT:CommandHandler(msg)
 	local _, _, cmd, args = string.find(msg, "%s?(%w+)%s?(.*)")
-	if cmd == "say" then
+	if cmd == "all" and args then
+		if args == "on" then
+			local opttext = { "filtersay", "filteryell", "hideAscButton", "filtertrial", "filterMEA", "filterAuto", "filterNew", "filterAscension", "filterWorld", "filterCOA", "filterBAU", "filterBAUAsc", "filterKeeper", "filterMotherlode", "filterDP", "filterTwitch", "autoGrabVanity", "filterALeader", "filterHLeader" }
+			for _, v in ipairs(opttext) do
+				XanAscTweaks[v] = true
+			end
+			reload = true
+		elseif args == "off" then
+			XanAscTweaks = {}
+			reload = true
+		else
+			XAT:printmsg("Invalid option.  'on' or 'off'")
+		end
+	elseif cmd == "say" then
 		XanAscTweaks.filtersay = toggle(XanAscTweaks.filtersay, "say")
 		reload = true
 	elseif cmd == "yell" then
@@ -179,17 +196,13 @@ function XAT:CommandHandler(msg)
 		reload = true
 	elseif cmd == "trial" then
 		XanAscTweaks.filtertrial = toggle(XanAscTweaks.filtertrial, "trial")
-		filters["Htrial:%d-:"] = XanAscTweaks.filtertrial or nil -- Trials
-		filters["%[.-Resolute.-Mode.-%]"] = XanAscTweaks.filtertrial or nil
-		filters["%[.-Nightmare.-%]"] = XanAscTweaks.filtertrial or nil
 		reload = true
 	elseif cmd == "altar" then
 		XanAscTweaks.filterMEA = toggle(XanAscTweaks.filterMEA, "altar")
-		filters["Hitem:1179126"] = XanAscTweaks.filterMEA or nil -- Mystic Enchanting Altar
 		reload = true
 	elseif cmd == "autobroadcast" then
 		XanAscTweaks.filterAuto = toggle(XanAscTweaks.filterAuto, "autobroadcast")
-		filters["%[.-Ascension.-Autobroadcast.-%]"] = XanAscTweaks.filterAuto or nil -- Auto Broadcasts
+		reload = true
 	elseif cmd == "new" then
 		XanAscTweaks.filterNew = toggle(XanAscTweaks.filterNew, "Newcomers chat")
 		reload = true
@@ -201,23 +214,25 @@ function XAT:CommandHandler(msg)
 		reload = true
 	elseif cmd == "coa" then
 		XanAscTweaks.filterCOA = toggle(XanAscTweaks.filterCOA, "Conquest of Azeroth Travel Guide")
-		filters["%[.-Conquest of Azeroth Travel Guide.-%]"] = XanAscTweaks.filterCOA or nil
+		reload = true
 	elseif cmd == "bau" then
 		XanAscTweaks.filterBAU = toggle(XanAscTweaks.filterBAU, "Northrend Travel Guide")
-		filters["%[.-Northrend Travel Guide.-%]"] = XanAscTweaks.filterBAU or nil
+		reload = true
 	elseif cmd == "bauchat" then
 		XanAscTweaks.filterBAUAsc = toggle(XanAscTweaks.filterBAUAsc, "bau in chat")
 		reload = true
 	elseif cmd == "keeper" then
 		XanAscTweaks.filterKeeper = toggle(XanAscTweaks.filterKeeper, "Keeper's Scroll")
-		filters["%[.-Keeper's.-Scroll.-%]"] = XanAscTweaks.filterKeeper or nil
+		reload = true
 	elseif cmd == "motherlode" then
 		XanAscTweaks.filterMotherlode = toggle(XanAscTweaks.filterMotherlode, "The Motherlode")
-		filters["%[.-The.-Motherlode.-%]"] = XanAscTweaks.filterMotherlode or nil
+		reload = true
 	elseif cmd == "dp" then
 		XanAscTweaks.filterDP = toggle(XanAscTweaks.filterDP, "dp in chat")
+		reload = true
 	elseif cmd == "twitch" then
 		XanAscTweaks.filterTwitch = toggle(XanAscTweaks.filterTwitch, "Twitch in chat")
+		reload = true
 	elseif cmd == "vanity" then
 		XanAscTweaks.autoGrabVanity = toggle(XanAscTweaks.autoGrabVanity, "Auto-grab Vanity")
 		if XanAscTweaks.autoGrabVanity then
@@ -225,12 +240,12 @@ function XAT:CommandHandler(msg)
 		end
 	elseif cmd == "aleader" then
 		XanAscTweaks.filterALeader = toggle(XanAscTweaks.filterALeader, "Alliance Leader Spawn Alerts")
-		filters["|TInterface\\Icons\\inv_alliancewareffort:16|t.-has spawned"] = XanAscTweaks.filterALeader or nil
+		reload = true
 	elseif cmd == "hleader" then
 		XanAscTweaks.filterHLeader = toggle(XanAscTweaks.filterHLeader, "Horde Leader Spawn Alerts")
-		filters["|TInterface\\Icons\\inv_hordewareffort:16|t.-has spawned"] = XanAscTweaks.filterHLeader or nil
+		reload = true
 	else
-		XAT:printmsg("Use '/xat option` where option can be one of;")
+		XAT:printmsg("Use '/xat all on|off' to quickly toggle all options.  Or use '/xat option` where option can be one of;")
 		local options = {
 			status(XanAscTweaks.filtersay) .. " `say` removed in rest areas",
 			status(XanAscTweaks.filteryell) .. " `yell` removed in rest areas",
@@ -248,7 +263,7 @@ function XAT:CommandHandler(msg)
 			status(XanAscTweaks.filterMotherlode) .. " `motherlode` is filtering Motherlodes",
 			status(XanAscTweaks.filterDP) .. " `dp` is hiding messages that contain dp and don't contain dps",
 			status(XanAscTweaks.filterTwitch) .. " `twitch` is hiding twitch links in Ascension and Newcomers",
-			status(XanAscTweaks.autoGrabVanity) .. " `vanity` is automatically grabbing vanity mounts, pets, and stones of retreat.",
+			status(XanAscTweaks.autoGrabVanity) .. " `vanity` is automatically grabbing unlearned vanity spells.",
 			status(XanAscTweaks.filterALeader) .. " `aleader` is hiding Alliance Leader spawn alerts.",
 			status(XanAscTweaks.filterHLeader) .. " `hleader` is hiding Horde Leader spawn alerts.",
 		}
@@ -304,7 +319,6 @@ end
 local function filterEmote(self, event, msg, ...)
 	if event ~= "CHAT_MSG_EMOTE" or not msg then return false end
 	return XanAscTweaks.filterMEA and msg:find("Use this to empower your character with powerful enchants")
-
 end
 
 -- remove BAU and DP from newcomers and ascension
