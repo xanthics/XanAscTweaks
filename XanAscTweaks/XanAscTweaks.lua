@@ -172,7 +172,7 @@ end
 -- handle slash commands
 function XAT:CommandHandler(msg)
 	local _, _, cmd, args = string.find(msg, "%s?(%w+)%s?(.*)")
-	if cmd == "all" and args then
+	if cmd == "all" then
 		if args == "on" then
 			local opttext = { "filtersay", "filteryell", "hideAscButton", "filtertrial", "filterMEA", "filterAuto", "filterNew", "filterAscension", "filterWorld", "filterCOA", "filterBAU", "filterBAUAsc", "filterKeeper", "filterMotherlode", "filterDP", "filterTwitch", "autoGrabVanity", "filterALeader", "filterHLeader" }
 			for _, v in ipairs(opttext) do
@@ -184,6 +184,16 @@ function XAT:CommandHandler(msg)
 			reload = true
 		else
 			XAT:printmsg("Invalid option.  'on' or 'off'")
+		end
+	elseif cmd == "afkmsg" then
+		if args == "" then
+			XanAscTweaks.afkmsg = nil
+			XanAscTweaks.afm_msg = nil
+			XAT:printmsg("`afkmsg` is deactivated.")
+		else
+			XanAscTweaks.afm_msg = args
+			XanAscTweaks.afkmsg = true
+			XAT:printmsg("`afkmsg` is now active.")
 		end
 	elseif cmd == "say" then
 		XanAscTweaks.filtersay = toggle(XanAscTweaks.filtersay, "say")
@@ -266,6 +276,7 @@ function XAT:CommandHandler(msg)
 			status(XanAscTweaks.autoGrabVanity) .. " `vanity` is automatically grabbing unlearned vanity spells.",
 			status(XanAscTweaks.filterALeader) .. " `aleader` is hiding Alliance Leader spawn alerts.",
 			status(XanAscTweaks.filterHLeader) .. " `hleader` is hiding Horde Leader spawn alerts.",
+			status(XanAscTweaks.afkmsg) .. " `afkmsg` is replacing your default afk message with a custom one.",
 		}
 		for _, option in pairs(options) do
 			XAT:printmsg(option, true)
@@ -389,7 +400,26 @@ function XAT.frame:PLAYER_ENTERING_WORLD(event, ...)
 	SlashCmdList["XAT"] = function(msg) XAT:CommandHandler(msg) end
 end
 
+function XAT.frame:PLAYER_FLAGS_CHANGED(...)
+	XAT.frame:UnregisterEvent("PLAYER_FLAGS_CHANGED")
+	if UnitIsAFK("player") then
+		SendChatMessage("", "AFK")           -- disables AFK
+		SendChatMessage(XanAscTweaks.afm_msg, "AFK") -- re-enables with custom msg
+	end
+end
+
+local p_mam = string.gsub(MARKED_AFK_MESSAGE, "%%s", "%(%.%+%)")
+function XAT.frame:CHAT_MSG_SYSTEM(event, msg, ...)
+	if XanAscTweaks.afkmsg then
+		local afk_msg = msg:match(p_mam)
+		if afk_msg and afk_msg == "Away" then
+			XAT.frame:RegisterEvent("PLAYER_FLAGS_CHANGED")
+		end
+	end
+end
+
 -- Main
 XAT.frame:RegisterEvent("ADDON_LOADED")
 XAT.frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+XAT.frame:RegisterEvent("CHAT_MSG_SYSTEM")
 XAT.frame:SetScript("OnEvent", XAT.XanEventHandler)

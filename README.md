@@ -22,6 +22,7 @@ Use '/xat all on|off' to quickly toggle all options.  Or use '/xat option` where
 `vanity` to automatically grab unlearned vanity spells
 `aleader` is hiding Alliance Leader spawn alerts.
 `hleader` is hiding Horde Leader spawn alerts.
+`afkmsg` is replacing your default afk message with a custom one.
 
 All Options, including new ones, default as disabled.
 ```
