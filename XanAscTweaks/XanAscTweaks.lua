@@ -186,10 +186,10 @@ function XAT:CommandHandler(msg)
 			XAT:printmsg("Invalid option.  'on' or 'off'")
 		end
 	elseif cmd == "afkmsg" then
-		if args == "" then
+		if args == "" or args == "Away" then
 			XanAscTweaks.afkmsg = nil
 			XanAscTweaks.afm_msg = nil
-			XAT:printmsg("`afkmsg` is deactivated.")
+			XAT:printmsg("`afkmsg` is deactivated.  Be sure to include a string to activate or update.")
 		else
 			XanAscTweaks.afm_msg = args
 			XanAscTweaks.afkmsg = true
@@ -222,8 +222,8 @@ function XAT:CommandHandler(msg)
 	elseif cmd == "world" then
 		XanAscTweaks.filterWorld = toggle(XanAscTweaks.filterWorld, "World chat")
 		reload = true
-	elseif cmd == "coa" then
-		XanAscTweaks.filterCOA = toggle(XanAscTweaks.filterCOA, "Conquest of Azeroth Travel Guide")
+	elseif cmd == "travel" then
+		XanAscTweaks.filterTravelGuide = toggle(XanAscTweaks.filterTravelGuide, "Travel Guide")
 		reload = true
 	elseif cmd == "bau" then
 		XanAscTweaks.filterBAU = toggle(XanAscTweaks.filterBAU, "Northrend Travel Guide")
@@ -266,8 +266,7 @@ function XAT:CommandHandler(msg)
 			status(XanAscTweaks.filterNew) .. " `new` is removing Newcomers from first chat tab",
 			status(XanAscTweaks.filterAscension) .. " `ascension` is removing Ascension from first chat tab",
 			status(XanAscTweaks.filterWorld) .. " `world`  is removing World from first chat tab",
-			status(XanAscTweaks.filterCOA) .. " `coa` is filtering Conquest of Azeroth Travel Guide",
-			status(XanAscTweaks.filterBAU) .. " `bau` is filtering Northrend Travel Guide",
+			status(XanAscTweaks.filterTravelGuide) .. " `travel` is filtering all Travel Guides to alpha realms",
 			status(XanAscTweaks.filterBAUAsc) .. " `bauchat` is hiding BAU from Ascension and Newcomers",
 			status(XanAscTweaks.filterKeeper) .. " `keeper` is filtering Keeper's Scrolls",
 			status(XanAscTweaks.filterMotherlode) .. " `motherlode` is filtering Motherlodes",
@@ -373,8 +372,7 @@ function XAT.frame:PLAYER_ENTERING_WORLD(event, ...)
 	filters["%[.-Nightmare.-%]"] = XanAscTweaks.filtertrial or nil
 	filters["Hitem:1179126"] = XanAscTweaks.filterMEA or nil                  -- Mystic Enchanting Altar
 	filters["%[.-Ascension.-Autobroadcast.-%]"] = XanAscTweaks.filterAuto or nil -- Auto Broadcasts
-	filters["%[.-Conquest of Azeroth Travel Guide.-%]"] = XanAscTweaks.filterCOA or nil
-	filters["%[.-Northrend Travel Guide.-%]"] = XanAscTweaks.filterBAU or nil
+	filters["%[.-Travel Guide.-%]"] = XanAscTweaks.filterTravelGuide or nil
 	filters["%[.-Keeper's.-Scroll.-%]"] = XanAscTweaks.filterKeeper or nil
 	filters["%[.-The.-Motherlode.-%]"] = XanAscTweaks.filterMotherlode or nil
 	filters["|TInterface\\Icons\\inv_alliancewareffort:16|t.-has spawned"] = XanAscTweaks.filterALeader or nil

@@ -12,8 +12,7 @@ Use '/xat all on|off' to quickly toggle all options.  Or use '/xat option` where
 `new` is removing Newcomers from first chat tab
 `ascension` is removing Ascension from first chat tab
 `world`  is removing World from first chat tab
-`coa` is filtering Conquest of Azeroth Travel Guide
-`bau` is filtering Northrend Travel Guide
+`travel` is filtering all Travel Guides to alpha realms
 `bauchat` is hiding BAU from Ascension and Newcomers
 `keeper` is filtering Keeper's Scrolls
 `motherlode` is filtering Motherlodes
