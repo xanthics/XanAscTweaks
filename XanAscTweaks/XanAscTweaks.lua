@@ -11,8 +11,8 @@ function XAT:getVanity()
 	if C_VanityCollection.IsCollectionItemOwned(next) then
 		RequestDeliverVanityCollectionItem(next)
 	end
-	if #XAT.grablist > 0 then
-		XAT:ScheduleTimer("getVanity", 2)
+	if #XAT.grablist <= 0 then
+		self:CancelTimer(self.getVanityTimer)
 	end
 end
 
@@ -132,7 +132,7 @@ function XAT:grabVanity()
 	if #XAT.grablist > 0 then
 		DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") ..
 			": Grabbing " .. #XAT.grablist .. " unlearned vanity spells.")
-		XAT:ScheduleTimer("getVanity", 2)
+		self.getVanityTimer = XAT:ScheduleRepeatingTimer("getVanity", 2)
 	end
 end
 
