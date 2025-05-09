@@ -1,6 +1,5 @@
--- XAT lets us communicate between files (Addon Namespace)
-local _, XAT = ...
-XAT.__index = XAT
+local addon = LibStub("AceAddon-3.0"):NewAddon("XAT", "AceTimer-3.0")
+_G.XAT = addon
 
 XAT.frame = CreateFrame("Frame") -- used multiple times
 local filters = {}
@@ -13,7 +12,7 @@ function XAT:getVanity()
 		RequestDeliverVanityCollectionItem(next)
 	end
 	if #XAT.grablist > 0 then
-		XAT:wait(1, XAT.getVanity, self)
+		XAT:ScheduleTimer("getVanity", 2)
 	end
 end
 
@@ -133,7 +132,7 @@ function XAT:grabVanity()
 	if #XAT.grablist > 0 then
 		DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") ..
 			": Grabbing " .. #XAT.grablist .. " unlearned vanity spells.")
-		XAT:wait(1, XAT.getVanity, self)
+		XAT:ScheduleTimer("getVanity", 2)
 	end
 end
 
@@ -379,7 +378,7 @@ function XAT.frame:PLAYER_ENTERING_WORLD(event, ...)
 	filters["|TInterface\\Icons\\inv_hordewareffort:16|t.-has spawned"] = XanAscTweaks.filterHLeader or nil
 
 	if XanAscTweaks.autoGrabVanity then
-		XAT:wait(5, XAT.grabVanity, self)
+		XAT:ScheduleTimer("grabVanity", 5)
 	end
 
 	if XanAscTweaks.hideAscButton then
@@ -392,7 +391,7 @@ function XAT.frame:PLAYER_ENTERING_WORLD(event, ...)
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", filterEmote)
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", filterChannel)
 
-	XAT:wait(1, XAT.hideNew, self)
+	XAT:ScheduleTimer("hideNew", 1)
 
 	SLASH_XAT1 = "/xat"
 	SlashCmdList["XAT"] = function(msg) XAT:CommandHandler(msg) end
