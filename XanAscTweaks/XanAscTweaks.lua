@@ -85,9 +85,11 @@ function XAT:grabVanity()
 	local badItems = {
 		["Alliance"] = {
 			--			[1780054] = true, -- Stone of Retreat: Razor Hill
+			[222739] = true, -- Tome of Polymorph: Frogduck
 		},
 		["Horde"] = {
 			--			[1780051] = true, -- Stone of Retreat: Goldshire
+			[222739] = true, -- Tome of Polymorph: Frogduck
 		}
 	}
 
@@ -111,8 +113,7 @@ function XAT:grabVanity()
 				mmm[rank] = { ["id"] = k, ["itemid"] = v.itemid }
 			elseif not (IsSpellKnown(v.learnedSpell) or known_spells[v.learnedSpell]) and not hasitem(v.itemid) then
 				if badItems[UnitFactionGroup("player")][v.itemid] then
-					DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") ..
-						": Skipping" .. v.name .. " as it is bugged and gives an unusable item instead of the spell.")
+					-- DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": Skipping " .. v.name .. " as it gives a potentially unusable item instead of the spell.")
 				else
 					table.insert(XAT.grablist, k)
 				end
