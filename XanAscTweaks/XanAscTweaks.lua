@@ -83,13 +83,14 @@ function XAT:grabVanity()
 	end
 
 	local badItems = {
+		["All"] = {
+			[222739] = true, -- Tome of Polymorph: Frogduck
+		},
 		["Alliance"] = {
 			--			[1780054] = true, -- Stone of Retreat: Razor Hill
-			[222739] = true, -- Tome of Polymorph: Frogduck
 		},
 		["Horde"] = {
 			--			[1780051] = true, -- Stone of Retreat: Goldshire
-			[222739] = true, -- Tome of Polymorph: Frogduck
 		}
 	}
 
@@ -112,7 +113,7 @@ function XAT:grabVanity()
 				if IsSpellKnown(v.learnedSpell) and rank > known_mmm then known_mmm = rank end
 				mmm[rank] = { ["id"] = k, ["itemid"] = v.itemid }
 			elseif not (IsSpellKnown(v.learnedSpell) or known_spells[v.learnedSpell]) and not hasitem(v.itemid) then
-				if badItems[UnitFactionGroup("player")][v.itemid] then
+				if badItems["All"][v.itemid] or badItems[UnitFactionGroup("player")][v.itemid] then
 					-- DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": Skipping " .. v.name .. " as it gives a potentially unusable item instead of the spell.")
 				else
 					table.insert(XAT.grablist, k)
@@ -382,7 +383,7 @@ function XAT.frame:PLAYER_ENTERING_WORLD(event, ...)
 		XAT:ScheduleTimer("grabVanity", 5)
 	end
 
-	if XanAscTweaks.hideAscButton then
+	if XanAscTweaks.hideAscButton and LibDBIcon10_AscensionUICA2 then
 		LibDBIcon10_AscensionUICA2:Hide()
 	end
 
