@@ -2,8 +2,8 @@ local L = LibStub("AceLocale-3.0"):NewLocale("XanAscTweaks", "enUS", true)
 if not L then return end
 
 L["Chat Message Filters"] = true
-L["Say in Rest"] = true
-L["Yell in Rest"] = true
+L["/Say in Rest"] = true
+L["/Yell in Rest"] = true
 L["Trial Messages"] = true
 L["Mystic Enchant Altars"] = true
 L["Asc Autobroadcasts"] = true
@@ -12,7 +12,7 @@ L["'bau' in chat"] = true
 L["Keeper Scrolls"] = true
 L["Motherlodes"] = true
 L["'dp' in chat"] = true
-L["Twitch links"] = true
+L["'twitch' in chat"] = true
 L["Alliance Leader Messages"] = true
 L["Horde Leader Messages"] = true
 L["Miscellaneous Options"] = true
