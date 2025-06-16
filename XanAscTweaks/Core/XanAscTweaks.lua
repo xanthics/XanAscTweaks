@@ -58,8 +58,8 @@ local options = {
 					values = function()
 						local r = {}
 
-						r["filtersay"] = L["Say in Rest"]
-						r["filteryell"] = L["Yell in Rest"]
+						r["filtersay"] = L["/Say in Rest"]
+						r["filteryell"] = L["/Yell in Rest"]
 						r["filtertrial"] = L["Trial Messages"]
 						r["filterMEA"] = L["Mystic Enchant Altars"]
 						r["filterAuto"] = L["Asc Autobroadcasts"]
@@ -68,7 +68,7 @@ local options = {
 						r["filterKeeper"] = L["Keeper Scrolls"]
 						r["filterMotherlode"] = L["Motherlodes"]
 						r["filterDP"] = L["'dp' in chat"]
-						r["filterTwitch"] = L["Twitch links"]
+						r["filterTwitch"] = L["'twitch' in chat"]
 						r["filterALeader"] = L["Alliance Leader Messages"]
 						r["filterHLeader"] = L["Horde Leader Messages"]
 
@@ -79,6 +79,7 @@ local options = {
 					end,
 					set = function(info, key, value)
 						addon.db.profile[key] = value
+						updateFilter()
 					end,
 				},
 				miscOptions = {
@@ -103,6 +104,7 @@ local options = {
 					end,
 					set = function(info, key, value)
 						addon.db.profile[key] = value
+						XAT:printmsg("changes pending /reload")
 					end,
 				},
 				autoSwitch = {
@@ -181,7 +183,7 @@ function XAT:CommandHandler(msg)
 	local _, _, cmd, args = string.find(msg, "%s?(%w+)%s?(.*)")
 	if cmd == "all" then
 		if args == "on" then
-			local opttext = { "filtersay", "filteryell", "hideAscButton", "filtertrial", "filterMEA", "filterAuto", "filterNew", "filterAscension", "filterWorld", "filterCOA", "filterBAU", "filterBAUAsc", "filterKeeper", "filterMotherlode", "filterDP", "filterTwitch", "autoGrabVanity", "filterALeader", "filterHLeader" }
+			local opttext = { "filtersay", "filteryell", "hideAscButton", "filtertrial", "filterMEA", "filterAuto", "filterNew", "filterAscension", "filterWorld", "filterCOA", "filterBAUAsc", "filterKeeper", "filterMotherlode", "filterDP", "filterTwitch", "autoGrabVanity", "filterALeader", "filterHLeader" }
 			for _, v in ipairs(opttext) do
 				XanAscTweaks[v] = true
 			end
@@ -192,6 +194,7 @@ function XAT:CommandHandler(msg)
 		else
 			XAT:printmsg("Invalid option.  'on' or 'off'")
 		end
+		updateFilter()
 	elseif cmd == "afkmsg" then
 		if args == "" or args == "Away" then
 			self.db.profile.afkmsg = nil
@@ -204,22 +207,20 @@ function XAT:CommandHandler(msg)
 		end
 	elseif cmd == "say" then
 		self.db.profile.filtersay = toggle(self.db.profile.filtersay, "say")
-		reload = true
 	elseif cmd == "yell" then
 		self.db.profile.filteryell = toggle(self.db.profile.filteryell, "yell")
-		reload = true
 	elseif cmd == "button" then
 		self.db.profile.hideAscButton = toggle(self.db.profile.hideAscButton, "button")
 		reload = true
 	elseif cmd == "trial" then
 		self.db.profile.filtertrial = toggle(self.db.profile.filtertrial, "trial")
-		reload = true
+		updateFilter()
 	elseif cmd == "altar" then
 		self.db.profile.filterMEA = toggle(self.db.profile.filterMEA, "altar")
-		reload = true
+		updateFilter()
 	elseif cmd == "autobroadcast" then
 		self.db.profile.filterAuto = toggle(self.db.profile.filterAuto, "autobroadcast")
-		reload = true
+		updateFilter()
 	elseif cmd == "new" then
 		self.db.profile.filterNew = toggle(self.db.profile.filterNew, "Newcomers chat")
 		reload = true
@@ -231,25 +232,19 @@ function XAT:CommandHandler(msg)
 		reload = true
 	elseif cmd == "travel" then
 		self.db.profile.filterTravelGuide = toggle(self.db.profile.filterTravelGuide, "Travel Guide")
-		reload = true
-	elseif cmd == "bau" then
-		self.db.profile.filterBAU = toggle(self.db.profile.filterBAU, "Northrend Travel Guide")
-		reload = true
+		updateFilter()
 	elseif cmd == "bauchat" then
 		self.db.profile.filterBAUAsc = toggle(self.db.profile.filterBAUAsc, "bau in chat")
-		reload = true
 	elseif cmd == "keeper" then
 		self.db.profile.filterKeeper = toggle(self.db.profile.filterKeeper, "Keeper's Scroll")
-		reload = true
+		updateFilter()
 	elseif cmd == "motherlode" then
 		self.db.profile.filterMotherlode = toggle(self.db.profile.filterMotherlode, "The Motherlode")
-		reload = true
+		updateFilter()
 	elseif cmd == "dp" then
 		self.db.profile.filterDP = toggle(self.db.profile.filterDP, "dp in chat")
-		reload = true
 	elseif cmd == "twitch" then
 		self.db.profile.filterTwitch = toggle(self.db.profile.filterTwitch, "Twitch in chat")
-		reload = true
 	elseif cmd == "vanity" then
 		self.db.profile.autoGrabVanity = toggle(self.db.profile.autoGrabVanity, "Auto-grab Vanity")
 		if self.db.profile.autoGrabVanity then
@@ -257,10 +252,10 @@ function XAT:CommandHandler(msg)
 		end
 	elseif cmd == "aleader" then
 		self.db.profile.filterALeader = toggle(self.db.profile.filterALeader, "Alliance Leader Spawn Alerts")
-		reload = true
+		updateFilter()
 	elseif cmd == "hleader" then
 		self.db.profile.filterHLeader = toggle(self.db.profile.filterHLeader, "Horde Leader Spawn Alerts")
-		reload = true
+		updateFilter()
 	else
 		XAT:printmsg("Use '/xat all on|off' to quickly toggle all options.  Or use '/xat option` where option can be one of;")
 		local options = {
@@ -304,6 +299,20 @@ function XAT:hideNew()
 	if self.db.profile.filterWorld then
 		ChatFrame_RemoveChannel(DEFAULT_CHAT_FRAME, "World")
 	end
+end
+
+--
+local function updateFilter()
+	filters["Htrial:%d-:"] = self.db.profile.filtertrial or nil -- Trials
+	filters["%[.-Resolute.-Mode.-%]"] = self.db.profile.filtertrial or nil
+	filters["%[.-Nightmare.-%]"] = self.db.profile.filtertrial or nil
+	filters["Hitem:1179126"] = self.db.profile.filterMEA or nil                  -- Mystic Enchanting Altar
+	filters["%[.-Ascension.-Autobroadcast.-%]"] = self.db.profile.filterAuto or nil -- Auto Broadcasts
+	filters["%[.-Travel Guide.-%]"] = self.db.profile.filterTravelGuide or nil
+	filters["%[.-Keeper's.-Scroll.-%]"] = self.db.profile.filterKeeper or nil
+	filters["%[.-The.-Motherlode.-%]"] = self.db.profile.filterMotherlode or nil
+	filters["|TInterface\\Icons\\inv_alliancewareffort:16|t.-has spawned"] = self.db.profile.filterALeader or nil
+	filters["|TInterface\\Icons\\inv_hordewareffort:16|t.-has spawned"] = self.db.profile.filterHLeader or nil
 end
 
 -- hide say/yell when in a city
@@ -403,16 +412,7 @@ function addon:OnInitialize()
 	self.optionsFrame.General = AceConfigDialog:AddToBlizOptions(self.name, L["Profiles"], self.name, "profiles")
 --	AceConfig:RegisterOptionsTable(self.name .. "SlashCmd", options_slashcmd, { "xantweaks", "xat" })
 	-- set up Ascension filters
-	filters["Htrial:%d-:"] = self.db.profile.filtertrial or nil -- Trials
-	filters["%[.-Resolute.-Mode.-%]"] = self.db.profile.filtertrial or nil
-	filters["%[.-Nightmare.-%]"] = self.db.profile.filtertrial or nil
-	filters["Hitem:1179126"] = self.db.profile.filterMEA or nil                  -- Mystic Enchanting Altar
-	filters["%[.-Ascension.-Autobroadcast.-%]"] = self.db.profile.filterAuto or nil -- Auto Broadcasts
-	filters["%[.-Travel Guide.-%]"] = self.db.profile.filterTravelGuide or nil
-	filters["%[.-Keeper's.-Scroll.-%]"] = self.db.profile.filterKeeper or nil
-	filters["%[.-The.-Motherlode.-%]"] = self.db.profile.filterMotherlode or nil
-	filters["|TInterface\\Icons\\inv_alliancewareffort:16|t.-has spawned"] = self.db.profile.filterALeader or nil
-	filters["|TInterface\\Icons\\inv_hordewareffort:16|t.-has spawned"] = self.db.profile.filterHLeader or nil
+	updateFilter()
 
 	if self.db.profile.autoGrabVanity then
 		XAT:ScheduleTimer("grabVanity", 5)
