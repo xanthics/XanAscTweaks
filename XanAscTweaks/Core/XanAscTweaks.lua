@@ -32,6 +32,20 @@ local defaults = {
 	},
 }
 
+-- update chat system filters
+local function updateFilter()
+	filters["Htrial:%d-:"] = addon.db.profile.filtertrial or nil -- Trials
+	filters["%[.-Resolute.-Mode.-%]"] = addon.db.profile.filtertrial or nil
+	filters["%[.-Nightmare.-%]"] = addon.db.profile.filtertrial or nil
+	filters["Hitem:1179126"] = addon.db.profile.filterMEA or nil -- Mystic Enchanting Altar
+	filters["%[.-Ascension.-Autobroadcast.-%]"] = addon.db.profile.filterAuto or nil -- Auto Broadcasts
+	filters["%[.-Travel Guide.-%]"] = addon.db.profile.filterTravelGuide or nil
+	filters["%[.-Keeper's.-Scroll.-%]"] = addon.db.profile.filterKeeper or nil
+	filters["%[.-The.-Motherlode.-%]"] = addon.db.profile.filterMotherlode or nil
+	filters["|TInterface\\Icons\\inv_alliancewareffort:16|t.-has spawned"] = addon.db.profile.filterALeader or nil
+	filters["|TInterface\\Icons\\inv_hordewareffort:16|t.-has spawned"] = addon.db.profile.filterHLeader or nil
+end
+
 local function config_toggle_get(info) return addon.db.profile[info[#info]] end
 local function config_toggle_set(info, v) addon.db.profile[info[#info]] = v end
 
@@ -276,20 +290,6 @@ function XAT:hideNew()
 	if self.db.profile.filterNew then ChatFrame_RemoveChannel(DEFAULT_CHAT_FRAME, "Newcomers") end
 	if self.db.profile.filterAscension then ChatFrame_RemoveChannel(DEFAULT_CHAT_FRAME, "Ascension") end
 	if self.db.profile.filterWorld then ChatFrame_RemoveChannel(DEFAULT_CHAT_FRAME, "World") end
-end
-
---
-local function updateFilter()
-	filters["Htrial:%d-:"] = addon.db.profile.filtertrial or nil -- Trials
-	filters["%[.-Resolute.-Mode.-%]"] = addon.db.profile.filtertrial or nil
-	filters["%[.-Nightmare.-%]"] = addon.db.profile.filtertrial or nil
-	filters["Hitem:1179126"] = addon.db.profile.filterMEA or nil -- Mystic Enchanting Altar
-	filters["%[.-Ascension.-Autobroadcast.-%]"] = addon.db.profile.filterAuto or nil -- Auto Broadcasts
-	filters["%[.-Travel Guide.-%]"] = addon.db.profile.filterTravelGuide or nil
-	filters["%[.-Keeper's.-Scroll.-%]"] = addon.db.profile.filterKeeper or nil
-	filters["%[.-The.-Motherlode.-%]"] = addon.db.profile.filterMotherlode or nil
-	filters["|TInterface\\Icons\\inv_alliancewareffort:16|t.-has spawned"] = addon.db.profile.filterALeader or nil
-	filters["|TInterface\\Icons\\inv_hordewareffort:16|t.-has spawned"] = addon.db.profile.filterHLeader or nil
 end
 
 -- hide say/yell when in a city
