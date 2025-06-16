@@ -1,0 +1,32 @@
+local L = LibStub("AceLocale-3.0"):NewLocale("XanAscTweaks", "enUS", true)
+if not L then return end
+
+L["Chat Message Filters"] = true
+L["/Say in Rest"] = true
+L["/Yell in Rest"] = true
+L["Trial Messages"] = true
+L["Mystic Enchant Altars"] = true
+L["Asc Autobroadcasts"] = true
+L["Travel Guides"] = true
+L["'bau' in chat"] = true
+L["Keeper Scrolls"] = true
+L["Motherlodes"] = true
+L["'dp' in chat"] = true
+L["'twitch' in chat"] = true
+L["Alliance Leader Messages"] = true
+L["Horde Leader Messages"] = true
+L["Miscellaneous Options"] = true
+L["Hide Character Advancement Button"] = true
+L["Remove Newcomer Chat on tab 1"] = true
+L["Remove Ascension Chat on tab 1"] = true
+L["Remove World Chat on tab 1"] = true
+L["Automatically grab unknown Vanity Spells"] = true
+L["Custom AFK"] = true
+L["Custom AFK Message"] = true
+L["Should Default AFK message be replaced"] = true
+L["AFK Message"] = true
+L["Enter a message to automatically set"] = true
+L["Options"] = true
+L["Default"] = true
+L["General"] = true
+L["Profiles"] = true
