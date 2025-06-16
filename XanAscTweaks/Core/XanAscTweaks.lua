@@ -1,11 +1,8 @@
---[[
-collect appearance
-/run local c=C_AppearanceCollection for b=0,4 do for s=1,GetContainerNumSlots(b) do local i=GetContainerItemID(b,s) local a=i and C_Appearance.GetItemAppearanceID(i) if a and not c.IsAppearanceCollected(a) then c.CollectItemAppearance(i) end end end
-]]
-
 local addon = LibStub("AceAddon-3.0"):NewAddon("XanAscTweaks", "AceTimer-3.0", "AceEvent-3.0")
 _G.XAT = addon
 local L = LibStub("AceLocale-3.0"):GetLocale("XanAscTweaks")
+
+local currentVersion = 1 -- [int] current version of options, to notify when things are added
 
 local filters = {}
 local reload -- track whether a change has been made that requires a reload to take effect
@@ -283,23 +280,23 @@ end
 
 --
 local function updateFilter()
-	filters["Htrial:%d-:"] = self.db.profile.filtertrial or nil -- Trials
-	filters["%[.-Resolute.-Mode.-%]"] = self.db.profile.filtertrial or nil
-	filters["%[.-Nightmare.-%]"] = self.db.profile.filtertrial or nil
-	filters["Hitem:1179126"] = self.db.profile.filterMEA or nil -- Mystic Enchanting Altar
-	filters["%[.-Ascension.-Autobroadcast.-%]"] = self.db.profile.filterAuto or nil -- Auto Broadcasts
-	filters["%[.-Travel Guide.-%]"] = self.db.profile.filterTravelGuide or nil
-	filters["%[.-Keeper's.-Scroll.-%]"] = self.db.profile.filterKeeper or nil
-	filters["%[.-The.-Motherlode.-%]"] = self.db.profile.filterMotherlode or nil
-	filters["|TInterface\\Icons\\inv_alliancewareffort:16|t.-has spawned"] = self.db.profile.filterALeader or nil
-	filters["|TInterface\\Icons\\inv_hordewareffort:16|t.-has spawned"] = self.db.profile.filterHLeader or nil
+	filters["Htrial:%d-:"] = addon.db.profile.filtertrial or nil -- Trials
+	filters["%[.-Resolute.-Mode.-%]"] = addon.db.profile.filtertrial or nil
+	filters["%[.-Nightmare.-%]"] = addon.db.profile.filtertrial or nil
+	filters["Hitem:1179126"] = addon.db.profile.filterMEA or nil -- Mystic Enchanting Altar
+	filters["%[.-Ascension.-Autobroadcast.-%]"] = addon.db.profile.filterAuto or nil -- Auto Broadcasts
+	filters["%[.-Travel Guide.-%]"] = addon.db.profile.filterTravelGuide or nil
+	filters["%[.-Keeper's.-Scroll.-%]"] = addon.db.profile.filterKeeper or nil
+	filters["%[.-The.-Motherlode.-%]"] = addon.db.profile.filterMotherlode or nil
+	filters["|TInterface\\Icons\\inv_alliancewareffort:16|t.-has spawned"] = addon.db.profile.filterALeader or nil
+	filters["|TInterface\\Icons\\inv_hordewareffort:16|t.-has spawned"] = addon.db.profile.filterHLeader or nil
 end
 
 -- hide say/yell when in a city
 local function filterAll(self, event, ...)
 	if IsResting() then
-		if self.db.profile.filtersay and event == "CHAT_MSG_SAY" then return true end
-		if self.db.profile.filteryell and event == "CHAT_MSG_YELL" then return true end
+		if addon.db.profile.filtersay and event == "CHAT_MSG_SAY" then return true end
+		if addon.db.profile.filteryell and event == "CHAT_MSG_YELL" then return true end
 	end
 	return false
 end
@@ -320,7 +317,7 @@ end
 -- filter system messages to remove various unwanted messages
 local function filterEmote(self, event, msg, ...)
 	if event ~= "CHAT_MSG_EMOTE" or not msg then return false end
-	return self.db.profile.filterMEA and msg:find("Use this to empower your character with powerful enchants")
+	return addon.db.profile.filterMEA and msg:find("Use this to empower your character with powerful enchants")
 end
 
 -- remove BAU and DP from newcomers and ascension
@@ -397,4 +394,12 @@ function addon:OnInitialize()
 
 	self:RegisterEvent("ADDON_LOADED")
 	self:RegisterEvent("CHAT_MSG_SYSTEM")
+
+	if self.db.version == nil then
+		XAT:printmsg("This appears to be your first time using XanAscTweaks.  Please check the options to see what is available.")
+		self.db.version = currentVersion
+	elseif self.db.version < currentVersion then
+		XAT:printmsg("XanAscTweaks has changed settings.  Please check the options.")
+		self.db.version = currentVersion
+	end
 end
