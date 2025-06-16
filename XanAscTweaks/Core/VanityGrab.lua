@@ -26,6 +26,21 @@ local function hasitem(itemID)
 	return false
 end
 
+local function helditems()
+	local ret = {}
+	local item, found, id
+	for bag = 0, 4 do
+		for slot = 1, GetContainerNumSlots(bag) do
+			item = GetContainerItemLink(bag, slot)
+			if item then
+				found, _, id = item:find("^|c%x+|Hitem:(%d+):.+")
+				if found then ret[tonumber(id)] = true end
+			end
+		end
+	end
+	return ret
+end
+
 local function isManastorm(v)
 	local manastorm_items = {
 		["Chakra Chug"] = true,
@@ -56,6 +71,7 @@ end
 function XAT:grabVanity()
 	XAT.grablist = {}
 	local known_spells = {}
+	local held_items = helditems()
 	for i = 1, GetNumCompanions("CRITTER") do
 		local _, _, sID = GetCompanionInfo("CRITTER", i)
 		known_spells[sID] = true
@@ -93,7 +109,7 @@ function XAT:grabVanity()
 				if rank > max_mmm then max_mmm = rank end
 				if IsSpellKnown(v.learnedSpell) and rank > known_mmm then known_mmm = rank end
 				mmm[rank] = { ["id"] = k, ["itemid"] = v.itemid }
-			elseif not (IsSpellKnown(v.learnedSpell) or known_spells[v.learnedSpell]) and not hasitem(v.itemid) then
+			elseif not (IsSpellKnown(v.learnedSpell) or known_spells[v.learnedSpell]) and not held_items[v.itemid] then
 				if badItems["All"][v.itemid] or badItems[UnitFactionGroup("player")][v.itemid] then
 					-- DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": Skipping " .. v.name .. " as it gives a potentially unusable item instead of the spell.")
 				else
@@ -103,10 +119,10 @@ function XAT:grabVanity()
 		end
 	end
 	for k, v in pairs(mCache) do
-		if not v.known and not hasitem(v.itemid) then table.insert(XAT.grablist, v.id) end
+		if not v.known and not held_items[v.itemid] then table.insert(XAT.grablist, v.id) end
 	end
 	for i = known_mmm + 1, max_mmm do
-		if not hasitem(mmm[i].itemid) then table.insert(XAT.grablist, mmm[i].id) end
+		if not held_items[mmm[i].itemid] then table.insert(XAT.grablist, mmm[i].id) end
 	end
 	if #XAT.grablist > 0 then
 		DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": Grabbing " .. #XAT.grablist .. " unlearned vanity spells.")
