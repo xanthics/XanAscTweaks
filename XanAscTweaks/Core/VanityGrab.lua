@@ -1,19 +1,13 @@
 function XAT:getVanity()
 	DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": " .. #XAT.grablist .. " item(s) left to grab.")
 	local next = table.remove(XAT.grablist)
-	if C_VanityCollection.IsCollectionItemOwned(next) then
-		RequestDeliverVanityCollectionItem(next)
-	end
-	if #XAT.grablist <= 0 then
-		self:CancelTimer(self.getVanityTimer)
-	end
+	if C_VanityCollection.IsCollectionItemOwned(next) then RequestDeliverVanityCollectionItem(next) end
+	if #XAT.grablist <= 0 then self:CancelTimer(self.getVanityTimer) end
 end
 
 local function findpartial(items, word)
 	for _, s in ipairs(items) do
-		if word:find(s) then
-			return true
-		end
+		if word:find(s) then return true end
 	end
 	return false
 end
@@ -24,10 +18,8 @@ local function hasitem(itemID)
 		for slot = 1, GetContainerNumSlots(bag) do
 			item = GetContainerItemLink(bag, slot)
 			if item then
-				found, _, id = item:find('^|c%x+|Hitem:(%d+):.+')
-				if found and tonumber(id) == itemID then
-					return true
-				end
+				found, _, id = item:find("^|c%x+|Hitem:(%d+):.+")
+				if found and tonumber(id) == itemID then return true end
 			end
 		end
 	end
@@ -58,9 +50,7 @@ local function isManastorm(v)
 	}
 	local name, rank = v.name:match("(.-) %(Rank (.-)%)")
 
-	if name and manastorm_items[name] then
-		return name, tonumber(rank), IsSpellKnown(v.learnedSpell)
-	end
+	if name and manastorm_items[name] then return name, tonumber(rank), IsSpellKnown(v.learnedSpell) end
 end
 
 function XAT:grabVanity()
@@ -84,7 +74,7 @@ function XAT:grabVanity()
 		},
 		["Horde"] = {
 			--			[1780051] = true, -- Stone of Retreat: Goldshire
-		}
+		},
 	}
 
 	local mCache = {}
@@ -97,9 +87,7 @@ function XAT:grabVanity()
 			--			if (((fullchecks[v.name] or findpartial(partialchecks, v.name)) and not IsSpellKnown(v.learnedSpell)) or
 			local name, rank, known = isManastorm(v)
 			if name then
-				if not mCache[name] or mCache[name].rank < rank then
-					mCache[name] = { ["rank"] = rank, ["known"] = known, ["id"] = k, ["itemid"] = v.itemid }
-				end
+				if not mCache[name] or mCache[name].rank < rank then mCache[name] = { ["rank"] = rank, ["known"] = known, ["id"] = k, ["itemid"] = v.itemid } end
 			elseif v.name:find("Millhouse Mobility Mixture %(Upgrade") then
 				local rank = tonumber(v.name:match("Millhouse Mobility Mixture %(Upgrade Rank (%d+)"))
 				if rank > max_mmm then max_mmm = rank end
@@ -115,18 +103,13 @@ function XAT:grabVanity()
 		end
 	end
 	for k, v in pairs(mCache) do
-		if not v.known and not hasitem(v.itemid) then
-			table.insert(XAT.grablist, v.id)
-		end
+		if not v.known and not hasitem(v.itemid) then table.insert(XAT.grablist, v.id) end
 	end
 	for i = known_mmm + 1, max_mmm do
-		if not hasitem(mmm[i].itemid) then
-			table.insert(XAT.grablist, mmm[i].id)
-		end
+		if not hasitem(mmm[i].itemid) then table.insert(XAT.grablist, mmm[i].id) end
 	end
 	if #XAT.grablist > 0 then
-		DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") ..
-			": Grabbing " .. #XAT.grablist .. " unlearned vanity spells.")
+		DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": Grabbing " .. #XAT.grablist .. " unlearned vanity spells.")
 		self.getVanityTimer = XAT:ScheduleRepeatingTimer("getVanity", 2)
 	end
 end

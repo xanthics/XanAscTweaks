@@ -8,10 +8,10 @@ _G.XAT = addon
 local L = LibStub("AceLocale-3.0"):GetLocale("XanAscTweaks")
 
 local filters = {}
-local reload                     -- track whether a change has been made that requires a reload to take effect
+local reload -- track whether a change has been made that requires a reload to take effect
 
 local defaults = {
-    ["profile"] = {
+	["profile"] = {
 		filtersay = false,
 		filteryell = false,
 		hideAscButton = false,
@@ -31,16 +31,16 @@ local defaults = {
 		filterALeader = false,
 		filterHLeader = false,
 		afkmsg = false,
-		afk_msg = ""
-    },
+		afk_msg = "",
+	},
 }
 
 local function config_toggle_get(info) return addon.db.profile[info[#info]] end
 local function config_toggle_set(info, v) addon.db.profile[info[#info]] = v end
 
 local options = {
-    ["type"] = "group",
-    ["handler"] = XAT,
+	["type"] = "group",
+	["handler"] = XAT,
 	["get"] = "OptionsGet",
 	["set"] = "OptionsSet",
 	["args"] = {
@@ -74,9 +74,7 @@ local options = {
 
 						return r
 					end,
-					get = function(info, key)
-						return addon.db.profile[key]
-					end,
+					get = function(info, key) return addon.db.profile[key] end,
 					set = function(info, key, value)
 						addon.db.profile[key] = value
 						updateFilter()
@@ -99,9 +97,7 @@ local options = {
 
 						return r
 					end,
-					get = function(info, key)
-						return addon.db.profile[key]
-					end,
+					get = function(info, key) return addon.db.profile[key] end,
 					set = function(info, key, value)
 						addon.db.profile[key] = value
 						XAT:printmsg("changes pending /reload")
@@ -119,7 +115,7 @@ local options = {
 							desc = L["Should Default AFK message be replaced"],
 							order = 12,
 							get = config_toggle_get,
-							set = config_toggle_set
+							set = config_toggle_set,
 						},
 						afk_msg = {
 							type = "input",
@@ -129,32 +125,26 @@ local options = {
 							get = function(info) return addon.db.profile.afk_msg end,
 							set = function(info, value)
 								-- Don't allow empty entries or the default "Away"
-								if value == "" or gsub(value, "%s+", "") == "" or value == "Away" or gsub(value, "%s+", "") == "Away" then 
+								if value == "" or gsub(value, "%s+", "") == "" or value == "Away" or gsub(value, "%s+", "") == "Away" then
 									addon.db.profile.afkmsg = nil
-									return 
-								end 
+									return
+								end
 								addon.db.profile.afk_msg = value
-							end
-						}
+							end,
+						},
 					},
 				},
 			},
 		},
 		profiles = nil, -- reserved for profile options
-    },
+	},
 }
 
-
-
 -- add color markup to a string
-function XAT:setColor(val)
-	return "|cFFFFBF00" .. val .. "|r"
-end
+function XAT:setColor(val) return "|cFFFFBF00" .. val .. "|r" end
 
 local function status(val)
-	if val then
-		return "|cFF00FF00On|r"
-	end
+	if val then return "|cFF00FF00On|r" end
 	return "|cFFFF0000Off|r"
 end
 
@@ -247,9 +237,7 @@ function XAT:CommandHandler(msg)
 		self.db.profile.filterTwitch = toggle(self.db.profile.filterTwitch, "Twitch in chat")
 	elseif cmd == "vanity" then
 		self.db.profile.autoGrabVanity = toggle(self.db.profile.autoGrabVanity, "Auto-grab Vanity")
-		if self.db.profile.autoGrabVanity then
-			XAT:grabVanity()
-		end
+		if self.db.profile.autoGrabVanity then XAT:grabVanity() end
 	elseif cmd == "aleader" then
 		self.db.profile.filterALeader = toggle(self.db.profile.filterALeader, "Alliance Leader Spawn Alerts")
 		updateFilter()
@@ -283,22 +271,14 @@ function XAT:CommandHandler(msg)
 			XAT:printmsg(option, true)
 		end
 	end
-	if reload then
-		XAT:printmsg("changes pending /reload")
-	end
+	if reload then XAT:printmsg("changes pending /reload") end
 end
 
 -- Ascension likes to enable some channels in default chat frame on login.  Disable them.
 function XAT:hideNew()
-	if self.db.profile.filterNew then
-		ChatFrame_RemoveChannel(DEFAULT_CHAT_FRAME, "Newcomers")
-	end
-	if self.db.profile.filterAscension then
-		ChatFrame_RemoveChannel(DEFAULT_CHAT_FRAME, "Ascension")
-	end
-	if self.db.profile.filterWorld then
-		ChatFrame_RemoveChannel(DEFAULT_CHAT_FRAME, "World")
-	end
+	if self.db.profile.filterNew then ChatFrame_RemoveChannel(DEFAULT_CHAT_FRAME, "Newcomers") end
+	if self.db.profile.filterAscension then ChatFrame_RemoveChannel(DEFAULT_CHAT_FRAME, "Ascension") end
+	if self.db.profile.filterWorld then ChatFrame_RemoveChannel(DEFAULT_CHAT_FRAME, "World") end
 end
 
 --
@@ -306,7 +286,7 @@ local function updateFilter()
 	filters["Htrial:%d-:"] = self.db.profile.filtertrial or nil -- Trials
 	filters["%[.-Resolute.-Mode.-%]"] = self.db.profile.filtertrial or nil
 	filters["%[.-Nightmare.-%]"] = self.db.profile.filtertrial or nil
-	filters["Hitem:1179126"] = self.db.profile.filterMEA or nil                  -- Mystic Enchanting Altar
+	filters["Hitem:1179126"] = self.db.profile.filterMEA or nil -- Mystic Enchanting Altar
 	filters["%[.-Ascension.-Autobroadcast.-%]"] = self.db.profile.filterAuto or nil -- Auto Broadcasts
 	filters["%[.-Travel Guide.-%]"] = self.db.profile.filterTravelGuide or nil
 	filters["%[.-Keeper's.-Scroll.-%]"] = self.db.profile.filterKeeper or nil
@@ -318,12 +298,8 @@ end
 -- hide say/yell when in a city
 local function filterAll(self, event, ...)
 	if IsResting() then
-		if self.db.profile.filtersay and event == "CHAT_MSG_SAY" then
-			return true
-		end
-		if self.db.profile.filteryell and event == "CHAT_MSG_YELL" then
-			return true
-		end
+		if self.db.profile.filtersay and event == "CHAT_MSG_SAY" then return true end
+		if self.db.profile.filteryell and event == "CHAT_MSG_YELL" then return true end
 	end
 	return false
 end
@@ -355,15 +331,9 @@ local function filterChannel(self, event, msg, ...)
 
 	local msglower = msg:lower()
 
-	if addon.db.profile.filterBAUAsc and msglower:find("bau") then
-		return true
-	end
-	if addon.db.profile.filterDP and not msglower:find("dps") and msglower:find("dp") then
-		return true
-	end
-	if addon.db.profile.filterTwitch and msglower:find("twitch") then
-		return true
-	end
+	if addon.db.profile.filterBAUAsc and msglower:find("bau") then return true end
+	if addon.db.profile.filterDP and not msglower:find("dps") and msglower:find("dp") then return true end
+	if addon.db.profile.filterTwitch and msglower:find("twitch") then return true end
 	return false
 end
 
@@ -371,15 +341,13 @@ end
 function XAT:ADDON_LOADED(event, ...)
 	self:UnregisterEvent("ADDON_LOADED")
 
-	if XanAscTweaks == nil then
-		XanAscTweaks = {}
-	end
+	if XanAscTweaks == nil then XanAscTweaks = {} end
 end
 
 function XAT:PLAYER_FLAGS_CHANGED(...)
 	XAT:UnregisterEvent("PLAYER_FLAGS_CHANGED")
 	if UnitIsAFK("player") then
-		SendChatMessage("", "AFK")           -- disables AFK
+		SendChatMessage("", "AFK") -- disables AFK
 		SendChatMessage(self.db.profile.afk_msg, "AFK") -- re-enables with custom msg
 	end
 end
@@ -388,9 +356,7 @@ local p_mam = string.gsub(MARKED_AFK_MESSAGE, "%%s", "%(%.%+%)")
 function XAT:CHAT_MSG_SYSTEM(event, msg, ...)
 	if self.db.profile.afkmsg then
 		local afk_msg = msg:match(p_mam)
-		if afk_msg and afk_msg == "Away" then
-			self:RegisterEvent("PLAYER_FLAGS_CHANGED")
-		end
+		if afk_msg and afk_msg == "Away" then self:RegisterEvent("PLAYER_FLAGS_CHANGED") end
 	end
 end
 
@@ -401,26 +367,22 @@ local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 function addon:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("XanAscTweaks", defaults, L["Default"])
 
---	self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
---	self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
---	self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
+	--	self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
+	--	self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
+	--	self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
 	options.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 
 	AceConfig:RegisterOptionsTable(self.name, options)
 	self.optionsFrame = LibStub("LibAboutPanel").new(nil, self.name)
 	self.optionsFrame.General = AceConfigDialog:AddToBlizOptions(self.name, L["General"], self.name, "main")
 	self.optionsFrame.General = AceConfigDialog:AddToBlizOptions(self.name, L["Profiles"], self.name, "profiles")
---	AceConfig:RegisterOptionsTable(self.name .. "SlashCmd", options_slashcmd, { "xantweaks", "xat" })
+	--	AceConfig:RegisterOptionsTable(self.name .. "SlashCmd", options_slashcmd, { "xantweaks", "xat" })
 	-- set up Ascension filters
 	updateFilter()
 
-	if self.db.profile.autoGrabVanity then
-		XAT:ScheduleTimer("grabVanity", 5)
-	end
+	if self.db.profile.autoGrabVanity then XAT:ScheduleTimer("grabVanity", 5) end
 
-	if self.db.profile.hideAscButton and LibDBIcon10_AscensionUICA2 then
-		LibDBIcon10_AscensionUICA2:Hide()
-	end
+	if self.db.profile.hideAscButton and LibDBIcon10_AscensionUICA2 then LibDBIcon10_AscensionUICA2:Hide() end
 
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", filterSystem)
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", filterAll)
