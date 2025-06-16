@@ -395,11 +395,11 @@ function addon:OnInitialize()
 	self:RegisterEvent("ADDON_LOADED")
 	self:RegisterEvent("CHAT_MSG_SYSTEM")
 
-	if self.db.version == nil then
+	if self.db.profile.version == nil then
 		XAT:printmsg("This appears to be your first time using XanAscTweaks.  Please check the options to see what is available.")
-		self.db.version = currentVersion
-	elseif self.db.version < currentVersion then
+		self.db.profile.version = currentVersion
+	elseif self.db.profile.version < currentVersion then
 		XAT:printmsg("XanAscTweaks has changed settings.  Please check the options.")
-		self.db.version = currentVersion
+		self.db.profile.version = currentVersion
 	end
 end
