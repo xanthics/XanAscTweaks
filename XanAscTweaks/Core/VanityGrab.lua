@@ -112,8 +112,8 @@ function XAT:grabVanity()
 				if IsSpellKnown(v.learnedSpell) and rank > known_mmm then known_mmm = rank end
 				mmm[rank] = { ["id"] = k, ["itemid"] = v.itemid }
 			elseif not (IsSpellKnown(v.learnedSpell) or known_spells[v.learnedSpell]) and not held_items[v.itemid] then
-				if badItems["All"][v.itemid] or badItems[UnitFactionGroup("player")][v.itemid] then
-					-- DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": Skipping " .. v.name .. " as it gives a potentially unusable item instead of the spell.")
+				if badItems["All"][v.itemid] or badItems[UnitFactionGroup("player")][v.itemid] or (v.name:find("Tome of") and not C_Player:IsHero()) then
+					-- DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": Skipping " .. v.name .. " as it potentially gives an unusable item instead of the spell.")
 				else
 					table.insert(XAT.grablist, k)
 				end
