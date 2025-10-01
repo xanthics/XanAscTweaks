@@ -183,14 +183,16 @@ end
 function XAT:CommandHandler(msg)
 	local _, _, cmd, args = string.find(msg, "%s?(%w+)%s?(.*)")
 	if cmd == "all" then
+		local opttext = { "filtersay", "filteryell", "hideAscButton", "filtertrial", "filterMEA", "filterAuto", "filterNew", "filterAscension", "filterWorld", "filterCOA", "filterBAUAsc", "filterKeeper", "filterMotherlode", "filterDP", "filterTwitch", "autoGrabVanity", "filterALeader", "filterHLeader", "filterTravelGuide" }
 		if args == "on" then
-			local opttext = { "filtersay", "filteryell", "hideAscButton", "filtertrial", "filterMEA", "filterAuto", "filterNew", "filterAscension", "filterWorld", "filterCOA", "filterBAUAsc", "filterKeeper", "filterMotherlode", "filterDP", "filterTwitch", "autoGrabVanity", "filterALeader", "filterHLeader" }
 			for _, v in ipairs(opttext) do
-				XanAscTweaks[v] = true
+				self.db.profile[v] = true
 			end
 			reload = true
 		elseif args == "off" then
-			XanAscTweaks = {}
+			for _, v in ipairs(opttext) do
+				self.db.profile[v] = false
+			end
 			reload = true
 		else
 			XAT:printmsg("Invalid option.  'on' or 'off'")
