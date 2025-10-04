@@ -42,30 +42,32 @@ local function helditems()
 end
 
 local function isManastorm(v)
-	local manastorm_items = {
-		["Chakra Chug"] = true,
-		["Genius Juice"] = true,
-		["Harm Repellant Remedy"] = true,
-		["Incantation Intensifier"] = true,
-		["Interrupt Rod"] = true,
-		["Long Haul Liquid"] = true,
-		["Manastorm Cleanse"] = true,
-		["Manastorm Curing"] = true,
-		["Manastorm Purification"] = true,
-		["Motion Lotion"] = true,
-		["Muscle Maxer"] = true,
-		["Rage Rush Solution"] = true,
-		["Reflex Booster"] = true,
-		["Sprint Serum"] = true,
-		["Taunting Tonic"] = true,
-		["Tiny Ticking Time-Bomb"] = true,
-		["Hearty Heal Upgrade"] = true,
-		["Cleanse"] = true,
-		["Purification"] = true,
-	}
-	local name, rank = v.name:match("(.-) %(Rank (.-)%)")
+	if C_Config.GetBoolConfig("CONFIG_MANASTORM_ENABLED") then 
+		local manastorm_items = {
+			["Chakra Chug"] = true,
+			["Genius Juice"] = true,
+			["Harm Repellant Remedy"] = true,
+			["Incantation Intensifier"] = true,
+			["Interrupt Rod"] = true,
+			["Long Haul Liquid"] = true,
+			["Manastorm Cleanse"] = true,
+			["Manastorm Curing"] = true,
+			["Manastorm Purification"] = true,
+			["Motion Lotion"] = true,
+			["Muscle Maxer"] = true,
+			["Rage Rush Solution"] = true,
+			["Reflex Booster"] = true,
+			["Sprint Serum"] = true,
+			["Taunting Tonic"] = true,
+			["Tiny Ticking Time-Bomb"] = true,
+			["Hearty Heal Upgrade"] = true,
+			["Cleanse"] = true,
+			["Purification"] = true,
+		}
+		local name, rank = v.name:match("(.-) %(Rank (.-)%)")
 
-	if name and manastorm_items[name] then return name, tonumber(rank), IsSpellKnown(v.learnedSpell) end
+		if name and manastorm_items[name] then return name, tonumber(rank), IsSpellKnown(v.learnedSpell) end
+	end
 end
 
 function XAT:grabVanity()
@@ -104,14 +106,14 @@ function XAT:grabVanity()
 			local name, rank, known = isManastorm(v)
 			if name then
 				if not mCache[name] or mCache[name].rank < rank then mCache[name] = { ["rank"] = rank, ["known"] = known, ["id"] = k, ["itemid"] = v.itemid } end
-			elseif v.name:find("Millhouse Mobility Mixture %(Upgrade") then
+			elseif v.name:find("Millhouse Mobility Mixture %(Upgrade") and C_Config.GetBoolConfig("CONFIG_MANASTORM_ENABLED") then
 				local rank = tonumber(v.name:match("Millhouse Mobility Mixture %(Upgrade Rank (%d+)"))
 				if rank > max_mmm then max_mmm = rank end
 				if IsSpellKnown(v.learnedSpell) and rank > known_mmm then known_mmm = rank end
 				mmm[rank] = { ["id"] = k, ["itemid"] = v.itemid }
 			elseif not (IsSpellKnown(v.learnedSpell) or known_spells[v.learnedSpell]) and not held_items[v.itemid] then
-				if badItems["All"][v.itemid] or badItems[UnitFactionGroup("player")][v.itemid] then
-					-- DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": Skipping " .. v.name .. " as it gives a potentially unusable item instead of the spell.")
+				if badItems["All"][v.itemid] or badItems[UnitFactionGroup("player")][v.itemid] or (v.name:find("Tome of") and not C_Player:IsHero()) then
+					-- DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": Skipping " .. v.name .. " as it potentially gives an unusable item instead of the spell.")
 				else
 					table.insert(XAT.grablist, k)
 				end

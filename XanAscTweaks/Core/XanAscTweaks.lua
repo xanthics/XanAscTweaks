@@ -8,29 +8,43 @@ local filters = {}
 local reload -- track whether a change has been made that requires a reload to take effect
 
 local defaults = {
-	["profile"] = {
-		filtersay = false,
-		filteryell = false,
-		hideAscButton = false,
-		filtertrial = false,
-		filterMEA = false,
-		filterAuto = false,
-		filterNew = false,
-		filterAscension = false,
-		filterWorld = false,
-		filterTravelGuide = false,
-		filterBAUAsc = false,
-		filterKeeper = false,
-		filterMotherlode = false,
-		filterDP = false,
-		filterTwitch = false,
-		autoGrabVanity = false,
-		filterALeader = false,
-		filterHLeader = false,
-		afkmsg = false,
-		afk_msg = "",
-	},
+    ["profile"] = {
+        filtersay = false,
+        filteryell = false,
+        hideAscButton = false,
+        filtertrial = false,
+        filterMEA = false,
+        filterAuto = false,
+        filterNew = false,
+        filterAscension = false,
+        filterWorld = false,
+        filterTravelGuide = false,
+        filterBAUAsc = false,
+        filterKeeper = false,
+        filterMotherlode = false,
+        filterDP = false,
+        filterTwitch = false,
+        filterDiscord = false,
+        autoGrabVanity = false,
+        filterALeader = false,
+        filterHLeader = false,
+        afkmsg = false,
+        afk_msg = "",
+		filterCriminal = false,
+        filterHardcore = false,
+		filterKeeperScroll = false,
+        filterPosture = false,
+    },
 }
+
+-- so that enable/disable all works with any option except afk
+local opttext = {}
+for k, v in pairs(defaults.profile) do
+	if k ~= "afkmsg" and k ~= "afk_msg" then
+		tinsert(opttext, k)
+	end
+end
+
 
 -- update chat system filters
 local function updateFilter()
@@ -44,6 +58,10 @@ local function updateFilter()
 	filters["%[.-The.-Motherlode.-%]"] = addon.db.profile.filterMotherlode or nil
 	filters["|TInterface\\Icons\\inv_alliancewareffort:16|t.-has spawned"] = addon.db.profile.filterALeader or nil
 	filters["|TInterface\\Icons\\inv_hordewareffort:16|t.-has spawned"] = addon.db.profile.filterHLeader or nil
+    filters["%[.-Criminal Intent.-%]"] = addon.db.profile.filterCriminal or nil
+    filters["%[.-Hardcore.-%]"] = addon.db.profile.filterHardcore or nil
+    filters["%[.-Keeper's Scroll.-%]"] = addon.db.profile.filterKeeperScroll or nil
+    filters["%[.-Posture Check.-%]"] = addon.db.profile.filterPosture or nil
 end
 
 local function config_toggle_get(info) return addon.db.profile[info[#info]] end
@@ -80,8 +98,13 @@ local options = {
 						r["filterMotherlode"] = L["Motherlodes"]
 						r["filterDP"] = L["'dp' in chat"]
 						r["filterTwitch"] = L["'twitch' in chat"]
+						r["filterDiscord"] = L["'discord.gg' in chat"]
 						r["filterALeader"] = L["Alliance Leader Messages"]
 						r["filterHLeader"] = L["Horde Leader Messages"]
+						r["filterCriminal"] = L["Criminal Intent Messages"]
+						r["filterHardcore"] = L["Hardcore Mode Messages"]
+						r["filterKeeperScroll"] = L["Keeper's Scroll Messages"]
+						r["filterPosture"] = L["Posture Check Messages"]
 
 						return r
 					end,
@@ -184,13 +207,14 @@ function XAT:CommandHandler(msg)
 	local _, _, cmd, args = string.find(msg, "%s?(%w+)%s?(.*)")
 	if cmd == "all" then
 		if args == "on" then
-			local opttext = { "filtersay", "filteryell", "hideAscButton", "filtertrial", "filterMEA", "filterAuto", "filterNew", "filterAscension", "filterWorld", "filterCOA", "filterBAUAsc", "filterKeeper", "filterMotherlode", "filterDP", "filterTwitch", "autoGrabVanity", "filterALeader", "filterHLeader" }
 			for _, v in ipairs(opttext) do
-				XanAscTweaks[v] = true
+				self.db.profile[v] = true
 			end
 			reload = true
 		elseif args == "off" then
-			XanAscTweaks = {}
+			for _, v in ipairs(opttext) do
+				self.db.profile[v] = false
+			end
 			reload = true
 		else
 			XAT:printmsg("Invalid option.  'on' or 'off'")
@@ -246,6 +270,8 @@ function XAT:CommandHandler(msg)
 		self.db.profile.filterDP = toggle(self.db.profile.filterDP, "dp in chat")
 	elseif cmd == "twitch" then
 		self.db.profile.filterTwitch = toggle(self.db.profile.filterTwitch, "Twitch in chat")
+	elseif cmd == "discord" then
+		self.db.profile.DiscordTwitch = toggle(self.db.profile.filterDiscord, "Discord in chat")
 	elseif cmd == "vanity" then
 		self.db.profile.autoGrabVanity = toggle(self.db.profile.autoGrabVanity, "Auto-grab Vanity")
 		if self.db.profile.autoGrabVanity then XAT:grabVanity() end
@@ -254,6 +280,18 @@ function XAT:CommandHandler(msg)
 		updateFilter()
 	elseif cmd == "hleader" then
 		self.db.profile.filterHLeader = toggle(self.db.profile.filterHLeader, "Horde Leader Spawn Alerts")
+		updateFilter()
+	elseif cmd == "criminal" then
+		self.db.profile.filterCriminal = toggle(self.db.profile.filterCriminal, "Criminal Intent Messages")
+		updateFilter()
+	elseif cmd == "hardcore" then
+		self.db.profile.filterHardcore = toggle(self.db.profile.filterHardcore, "Hardcore Mode Messages")
+		updateFilter()
+	elseif cmd == "keeperscroll" then
+		self.db.profile.filterKeeperScroll = toggle(self.db.profile.filterKeeperScroll, "Keeper's Scroll Messages")
+		updateFilter()
+	elseif cmd == "posture" then
+		self.db.profile.filterPosture = toggle(self.db.profile.filterPosture, "Posture Check Messages")
 		updateFilter()
 	else
 		XAT:printmsg("Use '/xat all on|off' to quickly toggle all options.  Or use '/xat option` where option can be one of;")
@@ -273,10 +311,15 @@ function XAT:CommandHandler(msg)
 			status(self.db.profile.filterMotherlode) .. " `motherlode` is filtering Motherlodes",
 			status(self.db.profile.filterDP) .. " `dp` is hiding messages that contain dp and don't contain dps",
 			status(self.db.profile.filterTwitch) .. " `twitch` is hiding twitch links in Ascension and Newcomers",
+			status(self.db.profile.filterDiscord) .. " `discord` is hiding discord links in Ascension and Newcomers",
 			status(self.db.profile.autoGrabVanity) .. " `vanity` is automatically grabbing unlearned vanity spells.",
 			status(self.db.profile.filterALeader) .. " `aleader` is hiding Alliance Leader spawn alerts.",
 			status(self.db.profile.filterHLeader) .. " `hleader` is hiding Horde Leader spawn alerts.",
 			status(self.db.profile.afkmsg) .. " `afkmsg` is replacing your default afk message with a custom one.",
+			status(self.db.profile.filterCriminal) .. " `criminal` is hiding Criminal Intent messages.",
+			status(self.db.profile.filterHardcore) .. " `hardcore` is hiding Hardcore mode messages.",
+			status(self.db.profile.filterKeeperScroll) .. " `keeperscroll` is hiding Keeper's Scroll messages.",
+			status(self.db.profile.filterPosture) .. " `posture` is hiding Posture Check messages.",
 		}
 		for _, option in pairs(options) do
 			XAT:printmsg(option, true)
@@ -317,7 +360,7 @@ end
 -- filter system messages to remove various unwanted messages
 local function filterEmote(self, event, msg, ...)
 	if event ~= "CHAT_MSG_EMOTE" or not msg then return false end
-	return addon.db.profile.filterMEA and msg:find("Use this to empower your character with powerful enchants")
+	return addon.db.profile.filterMEA and msg:find("Use this to empower.-powerful enchants")
 end
 
 -- remove BAU and DP from newcomers and ascension
@@ -331,6 +374,7 @@ local function filterChannel(self, event, msg, ...)
 	if addon.db.profile.filterBAUAsc and msglower:find("bau") then return true end
 	if addon.db.profile.filterDP and not msglower:find("dps") and msglower:find("dp") then return true end
 	if addon.db.profile.filterTwitch and msglower:find("twitch") then return true end
+	if addon.db.profile.filterDiscord and msglower:find("discord.gg") then return true end
 	return false
 end
 
