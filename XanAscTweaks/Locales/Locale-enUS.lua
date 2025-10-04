@@ -30,3 +30,7 @@ L["Options"] = true
 L["Default"] = true
 L["General"] = true
 L["Profiles"] = true
+L["Criminal Intent Messages"] = "Criminal Intent Messages"
+L["Hardcore Mode Messages"] = "Hardcore Mode Messages"
+L["Keeper's Scroll Messages"] = "Keeper's Scroll Messages"
+L["Posture Check Messages"] = "Posture Check Messages"
