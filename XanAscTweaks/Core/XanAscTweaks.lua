@@ -8,28 +8,32 @@ local filters = {}
 local reload -- track whether a change has been made that requires a reload to take effect
 
 local defaults = {
-	["profile"] = {
-		filtersay = false,
-		filteryell = false,
-		hideAscButton = false,
-		filtertrial = false,
-		filterMEA = false,
-		filterAuto = false,
-		filterNew = false,
-		filterAscension = false,
-		filterWorld = false,
-		filterTravelGuide = false,
-		filterBAUAsc = false,
-		filterKeeper = false,
-		filterMotherlode = false,
-		filterDP = false,
-		filterTwitch = false,
-		autoGrabVanity = false,
-		filterALeader = false,
-		filterHLeader = false,
-		afkmsg = false,
-		afk_msg = "",
-	},
+    ["profile"] = {
+        filtersay = false,
+        filteryell = false,
+        hideAscButton = false,
+        filtertrial = false,
+        filterMEA = false,
+        filterAuto = false,
+        filterNew = false,
+        filterAscension = false,
+        filterWorld = false,
+        filterTravelGuide = false,
+        filterBAUAsc = false,
+        filterKeeper = false,
+        filterMotherlode = false,
+        filterDP = false,
+        filterTwitch = false,
+        autoGrabVanity = false,
+        filterALeader = false,
+        filterHLeader = false,
+        afkmsg = false,
+        afk_msg = "",
+		filterCriminal = false,
+        filterHardcore = false,
+		filterKeeperScroll = false,
+        filterPosture = false,
+    },
 }
 
 -- update chat system filters
@@ -44,6 +48,10 @@ local function updateFilter()
 	filters["%[.-The.-Motherlode.-%]"] = addon.db.profile.filterMotherlode or nil
 	filters["|TInterface\\Icons\\inv_alliancewareffort:16|t.-has spawned"] = addon.db.profile.filterALeader or nil
 	filters["|TInterface\\Icons\\inv_hordewareffort:16|t.-has spawned"] = addon.db.profile.filterHLeader or nil
+    filters["%[.-Criminal Intent.-%]"] = addon.db.profile.filterCriminal or nil
+    filters["%[.-Hardcore.-%]"] = addon.db.profile.filterHardcore or nil
+    filters["%[.-Keeper's Scroll.-%]"] = addon.db.profile.filterKeeperScroll or nil
+    filters["%[.-Posture Check.-%]"] = addon.db.profile.filterPosture or nil
 end
 
 local function config_toggle_get(info) return addon.db.profile[info[#info]] end
@@ -82,6 +90,10 @@ local options = {
 						r["filterTwitch"] = L["'twitch' in chat"]
 						r["filterALeader"] = L["Alliance Leader Messages"]
 						r["filterHLeader"] = L["Horde Leader Messages"]
+						r["filterCriminal"] = L["Criminal Intent Messages"]
+						r["filterHardcore"] = L["Hardcore Mode Messages"]
+						r["filterKeeperScroll"] = L["Keeper's Scroll Messages"]
+						r["filterPosture"] = L["Posture Check Messages"]
 
 						return r
 					end,
@@ -257,6 +269,18 @@ function XAT:CommandHandler(msg)
 	elseif cmd == "hleader" then
 		self.db.profile.filterHLeader = toggle(self.db.profile.filterHLeader, "Horde Leader Spawn Alerts")
 		updateFilter()
+	elseif cmd == "criminal" then
+		self.db.profile.filterCriminal = toggle(self.db.profile.filterCriminal, "Criminal Intent Messages")
+		updateFilter()
+	elseif cmd == "hardcore" then
+		self.db.profile.filterHardcore = toggle(self.db.profile.filterHardcore, "Hardcore Mode Messages")
+		updateFilter()
+	elseif cmd == "keeperscroll" then
+		self.db.profile.filterKeeperScroll = toggle(self.db.profile.filterKeeperScroll, "Keeper's Scroll Messages")
+		updateFilter()
+	elseif cmd == "posture" then
+		self.db.profile.filterPosture = toggle(self.db.profile.filterPosture, "Posture Check Messages")
+		updateFilter()
 	else
 		XAT:printmsg("Use '/xat all on|off' to quickly toggle all options.  Or use '/xat option` where option can be one of;")
 		local options = {
@@ -279,6 +303,10 @@ function XAT:CommandHandler(msg)
 			status(self.db.profile.filterALeader) .. " `aleader` is hiding Alliance Leader spawn alerts.",
 			status(self.db.profile.filterHLeader) .. " `hleader` is hiding Horde Leader spawn alerts.",
 			status(self.db.profile.afkmsg) .. " `afkmsg` is replacing your default afk message with a custom one.",
+			status(self.db.profile.filterCriminal) .. " `criminal` is hiding Criminal Intent messages.",
+			status(self.db.profile.filterHardcore) .. " `hardcore` is hiding Hardcore mode messages.",
+			status(self.db.profile.filterKeeperScroll) .. " `keeperscroll` is hiding Keeper's Scroll messages.",
+			status(self.db.profile.filterPosture) .. " `posture` is hiding Posture Check messages.",
 		}
 		for _, option in pairs(options) do
 			XAT:printmsg(option, true)
