@@ -24,6 +24,7 @@ local defaults = {
         filterMotherlode = false,
         filterDP = false,
         filterTwitch = false,
+        filterDiscord = false,
         autoGrabVanity = false,
         filterALeader = false,
         filterHLeader = false,
@@ -35,6 +36,15 @@ local defaults = {
         filterPosture = false,
     },
 }
+
+-- so that enable/disable all works with any option except afk
+local opttext = {}
+for k, v in pairs(defaults.profile) do
+	if k ~= "afkmsg" and k ~= "afk_msg" then
+		tinsert(opttext, k)
+	end
+end
+
 
 -- update chat system filters
 local function updateFilter()
@@ -88,6 +98,7 @@ local options = {
 						r["filterMotherlode"] = L["Motherlodes"]
 						r["filterDP"] = L["'dp' in chat"]
 						r["filterTwitch"] = L["'twitch' in chat"]
+						r["filterDiscord"] = L["'discord.gg' in chat"]
 						r["filterALeader"] = L["Alliance Leader Messages"]
 						r["filterHLeader"] = L["Horde Leader Messages"]
 						r["filterCriminal"] = L["Criminal Intent Messages"]
@@ -195,7 +206,6 @@ end
 function XAT:CommandHandler(msg)
 	local _, _, cmd, args = string.find(msg, "%s?(%w+)%s?(.*)")
 	if cmd == "all" then
-		local opttext = { "filtersay", "filteryell", "hideAscButton", "filtertrial", "filterMEA", "filterAuto", "filterNew", "filterAscension", "filterWorld", "filterCOA", "filterBAUAsc", "filterKeeper", "filterMotherlode", "filterDP", "filterTwitch", "autoGrabVanity", "filterALeader", "filterHLeader", "filterTravelGuide" }
 		if args == "on" then
 			for _, v in ipairs(opttext) do
 				self.db.profile[v] = true
@@ -260,6 +270,8 @@ function XAT:CommandHandler(msg)
 		self.db.profile.filterDP = toggle(self.db.profile.filterDP, "dp in chat")
 	elseif cmd == "twitch" then
 		self.db.profile.filterTwitch = toggle(self.db.profile.filterTwitch, "Twitch in chat")
+	elseif cmd == "discord" then
+		self.db.profile.DiscordTwitch = toggle(self.db.profile.filterDiscord, "Discord in chat")
 	elseif cmd == "vanity" then
 		self.db.profile.autoGrabVanity = toggle(self.db.profile.autoGrabVanity, "Auto-grab Vanity")
 		if self.db.profile.autoGrabVanity then XAT:grabVanity() end
@@ -299,6 +311,7 @@ function XAT:CommandHandler(msg)
 			status(self.db.profile.filterMotherlode) .. " `motherlode` is filtering Motherlodes",
 			status(self.db.profile.filterDP) .. " `dp` is hiding messages that contain dp and don't contain dps",
 			status(self.db.profile.filterTwitch) .. " `twitch` is hiding twitch links in Ascension and Newcomers",
+			status(self.db.profile.filterDiscord) .. " `discord` is hiding discord links in Ascension and Newcomers",
 			status(self.db.profile.autoGrabVanity) .. " `vanity` is automatically grabbing unlearned vanity spells.",
 			status(self.db.profile.filterALeader) .. " `aleader` is hiding Alliance Leader spawn alerts.",
 			status(self.db.profile.filterHLeader) .. " `hleader` is hiding Horde Leader spawn alerts.",
@@ -361,6 +374,7 @@ local function filterChannel(self, event, msg, ...)
 	if addon.db.profile.filterBAUAsc and msglower:find("bau") then return true end
 	if addon.db.profile.filterDP and not msglower:find("dps") and msglower:find("dp") then return true end
 	if addon.db.profile.filterTwitch and msglower:find("twitch") then return true end
+	if addon.db.profile.filterDiscord and msglower:find("discord.gg") then return true end
 	return false
 end
 

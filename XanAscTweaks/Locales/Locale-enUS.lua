@@ -13,6 +13,7 @@ L["Keeper Scrolls"] = true
 L["Motherlodes"] = true
 L["'dp' in chat"] = true
 L["'twitch' in chat"] = true
+L["'discord.gg' in chat"] = true
 L["Alliance Leader Messages"] = true
 L["Horde Leader Messages"] = true
 L["Miscellaneous Options"] = true
