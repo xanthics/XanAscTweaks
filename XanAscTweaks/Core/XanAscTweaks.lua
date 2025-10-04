@@ -39,8 +39,6 @@ local defaults = {
 -- update chat system filters
 local function updateFilter()
 	filters["Htrial:%d-:"] = addon.db.profile.filtertrial or nil -- Trials
-	filters["Criminal Intent"] = addon.db.profile.filterCriminal or nil
-    filters["Hardcore"] = addon.db.profile.filterHardcore or nil
 	filters["%[.-Resolute.-Mode.-%]"] = addon.db.profile.filtertrial or nil
 	filters["%[.-Nightmare.-%]"] = addon.db.profile.filtertrial or nil
 	filters["Hitem:1179126"] = addon.db.profile.filterMEA or nil -- Mystic Enchanting Altar
@@ -50,8 +48,10 @@ local function updateFilter()
 	filters["%[.-The.-Motherlode.-%]"] = addon.db.profile.filterMotherlode or nil
 	filters["|TInterface\\Icons\\inv_alliancewareffort:16|t.-has spawned"] = addon.db.profile.filterALeader or nil
 	filters["|TInterface\\Icons\\inv_hordewareffort:16|t.-has spawned"] = addon.db.profile.filterHLeader or nil
-	filters["Keeper's Scroll"] = addon.db.profile.filterKeeperScroll or nil
-    filters["Posture Check"] = addon.db.profile.filterPosture or nil
+    filters["%[.-Criminal Intent.-%]"] = addon.db.profile.filterCriminal or nil
+    filters["%[.-Hardcore.-%]"] = addon.db.profile.filterHardcore or nil
+    filters["%[.-Keeper's Scroll.-%]"] = addon.db.profile.filterKeeperScroll or nil
+    filters["%[.-Posture Check.-%]"] = addon.db.profile.filterPosture or nil
 end
 
 local function config_toggle_get(info) return addon.db.profile[info[#info]] end
