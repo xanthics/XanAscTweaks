@@ -44,6 +44,9 @@ end
 local function isManastorm(v)
 	local manastorm_items = {
 		["Chakra Chug"] = true,
+		["Cleanse"] = true,
+		["Curing"] = true,
+		["Frogduck Morph Machine"] = true,
 		["Genius Juice"] = true,
 		["Harm Repellant Remedy"] = true,
 		["Incantation Intensifier"] = true,
@@ -52,21 +55,25 @@ local function isManastorm(v)
 		["Manastorm Cleanse"] = true,
 		["Manastorm Curing"] = true,
 		["Manastorm Purification"] = true,
+		["Millhouse Mobility Mixture"] = true,
 		["Motion Lotion"] = true,
 		["Muscle Maxer"] = true,
+		["Purification"] = true,
+		["Purge-O-Matic"] = true,
 		["Rage Rush Solution"] = true,
 		["Reflex Booster"] = true,
 		["Sprint Serum"] = true,
 		["Taunting Tonic"] = true,
 		["Tiny Ticking Time-Bomb"] = true,
 		["Hearty Heal Upgrade"] = true,
-		["Cleanse"] = true,
-		["Purification"] = true,
 	}
-	local name, rank = v.name:match("(.-) %(Rank (.-)%)")
 
+	if manastorm_items[v.name] then
+		return v.name, 1, IsSpellKnown(v.learnedSpell) or not C_Config.GetBoolConfig("CONFIG_MANASTORM_ENABLED")
+	end
+	local name, rank = v.name:match("(.-) %(Rank (.-)%)")
 	if name and manastorm_items[name] then 
-		return name, tonumber(rank), IsSpellKnown(v.learnedSpell) or not C_Config.GetBoolConfig("CONFIG_MANASTORM_ENABLED")
+			return name, tonumber(rank), IsSpellKnown(v.learnedSpell) or not C_Config.GetBoolConfig("CONFIG_MANASTORM_ENABLED")
 	end
 end
 
