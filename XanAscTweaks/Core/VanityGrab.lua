@@ -86,12 +86,16 @@ function XAT:grabVanity()
 	local badItems = {
 		["All"] = {
 			[222739] = true, -- Tome of Polymorph: Frogduck
+			[3001007] = true, -- Felforged Tome: Journeyman Riding
+			[3001008] = true, -- Felforged Tome: Apprentice Riding
+			[1030180] = true, -- Felforged Tome: Track Humanoids
+			[79315] = true, -- Felforged Tome: Rush of Adrenaline V
+			[101170] = true, -- Felforged Tome: Relentless V
+			[79316] = true, -- Felforged Tome: Fel Blood V
 		},
 		["Alliance"] = {
-			--			[1780054] = true, -- Stone of Retreat: Razor Hill
 		},
 		["Horde"] = {
-			--			[1780051] = true, -- Stone of Retreat: Goldshire
 		},
 	}
 
