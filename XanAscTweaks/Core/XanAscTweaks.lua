@@ -360,7 +360,7 @@ end
 -- filter system messages to remove various unwanted messages
 local function filterEmote(self, event, msg, ...)
 	if event ~= "CHAT_MSG_EMOTE" or not msg then return false end
-	return addon.db.profile.filterMEA and msg:find("Use this to empower.-powerful enchants")
+	return addon.db.profile.filterMEA and msg:find("Use it to empower.-powerful enchants")
 end
 
 -- remove BAU and DP from newcomers and ascension
@@ -381,7 +381,8 @@ end
 -- check that saved variable are initialized
 function XAT:ADDON_LOADED(event, ...)
 	self:UnregisterEvent("ADDON_LOADED")
-
+	C_CVar.Set("holdToCast", 0)
+	C_CVar.Set("holdToCast", 1)
 	if XanAscTweaks == nil then XanAscTweaks = {} end
 end
 
