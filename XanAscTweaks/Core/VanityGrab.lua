@@ -106,29 +106,44 @@ function XAT:grabVanity()
 		},
 	}
 
+	-- some bundles contain a vanity spell that unlocks in your wardrobe but doesn't teach you the spell
+	-- [spellID] = vanityID
+	local nestedSpell = {
+		[571959] = 902229, -- Stargazer's Blessing
+	}
+
 	local mCache = {}
 	local mmm = {}
 	local max_mmm = 0
 	local known_mmm = 0
 	for k, v in pairs(VANITY_ITEMS) do
-		if C_VanityCollection.IsCollectionItemOwned(k) and v.learnedSpell > 1 then
-			local _, _, _, _, _, _, s = GetItemInfo(v.itemid)
-			--			if (((fullchecks[v.name] or findpartial(partialchecks, v.name)) and not IsSpellKnown(v.learnedSpell)) or
-			local name, rank, known = isManastorm(v)
-			if name then
-				if not mCache[name] or mCache[name].rank < rank then mCache[name] = { ["rank"] = rank, ["known"] = known, ["id"] = k, ["itemid"] = v.itemid } end
-			elseif v.name:find("Millhouse Mobility Mixture %(Upgrade") then
-				if C_Config.GetBoolConfig("CONFIG_MANASTORM_ENABLED") then
-					local rank = tonumber(v.name:match("Millhouse Mobility Mixture %(Upgrade Rank (%d+)"))
-					if rank > max_mmm then max_mmm = rank end
-					if IsSpellKnown(v.learnedSpell) and rank > known_mmm then known_mmm = rank end
-					mmm[rank] = { ["id"] = k, ["itemid"] = v.itemid }
+		if C_VanityCollection.IsCollectionItemOwned(k) then
+			if v.learnedSpell > 1 then
+				local _, _, _, _, _, _, s = GetItemInfo(v.itemid)
+				--			if (((fullchecks[v.name] or findpartial(partialchecks, v.name)) and not IsSpellKnown(v.learnedSpell)) or
+				local name, rank, known = isManastorm(v)
+				if name then
+					if not mCache[name] or mCache[name].rank < rank then mCache[name] = { ["rank"] = rank, ["known"] = known, ["id"] = k, ["itemid"] = v.itemid } end
+				elseif v.name:find("Millhouse Mobility Mixture %(Upgrade") then
+					if C_Config.GetBoolConfig("CONFIG_MANASTORM_ENABLED") then
+						local rank = tonumber(v.name:match("Millhouse Mobility Mixture %(Upgrade Rank (%d+)"))
+						if rank > max_mmm then max_mmm = rank end
+						if IsSpellKnown(v.learnedSpell) and rank > known_mmm then known_mmm = rank end
+						mmm[rank] = { ["id"] = k, ["itemid"] = v.itemid }
+					end
+				elseif not (IsSpellKnown(v.learnedSpell) or known_spells[v.learnedSpell]) and not held_items[v.itemid] then
+					if badItems["All"][v.itemid] or badItems[UnitFactionGroup("player")][v.itemid] or (v.name:find("Tome of") and not C_Player:IsHero()) then
+						-- DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": Skipping " .. v.name .. " as it potentially gives an unusable item instead of the spell.")
+					else
+						table.insert(XAT.grablist, k)
+					end
 				end
-			elseif not (IsSpellKnown(v.learnedSpell) or known_spells[v.learnedSpell]) and not held_items[v.itemid] then
-				if badItems["All"][v.itemid] or badItems[UnitFactionGroup("player")][v.itemid] or (v.name:find("Tome of") and not C_Player:IsHero()) then
-					-- DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": Skipping " .. v.name .. " as it potentially gives an unusable item instead of the spell.")
-				else
-					table.insert(XAT.grablist, k)
+			else
+				if nestedSpell[v.itemid] and not held_items[v.itemid] then
+					local spellid = nestedSpell[v.itemid]
+					if not IsSpellKnown(spellid) then
+						table.insert(XAT.grablist, k)
+					end
 				end
 			end
 		end
