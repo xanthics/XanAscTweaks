@@ -398,11 +398,18 @@ local function filterEmote(self, event, msg, ...)
 	return addon.db.profile.filterMEA and msg:find("Use it to empower.-powerful enchants")
 end
 
--- remove BAU and DP from newcomers and ascension
+local dontParseChannels = {
+	["guild"] = true,
+	["officer"] = true,
+	["raid"] = true,
+	["whisper"] = true,
+}
+
+-- remove some spam from channels not in dontParseChannels
 local function filterChannel(self, event, msg, ...)
 	local channel = select(8, ...)
 	channel = channel:lower()
-	if event ~= "CHAT_MSG_CHANNEL" or not msg or (channel ~= "ascension" and channel ~= "newcomers") then return false end
+	if event ~= "CHAT_MSG_CHANNEL" or not msg or dontParseChannels[channel] then return false end
 
 	local msglower = msg:lower()
 

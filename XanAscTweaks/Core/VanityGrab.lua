@@ -120,7 +120,6 @@ function XAT:grabVanity()
 		if C_VanityCollection.IsCollectionItemOwned(k) then
 			if v.learnedSpell > 1 then
 				local _, _, _, _, _, _, s = GetItemInfo(v.itemid)
-				--			if (((fullchecks[v.name] or findpartial(partialchecks, v.name)) and not IsSpellKnown(v.learnedSpell)) or
 				local name, rank, known = isManastorm(v)
 				if name then
 					if not mCache[name] or mCache[name].rank < rank then mCache[name] = { ["rank"] = rank, ["known"] = known, ["id"] = k, ["itemid"] = v.itemid } end
