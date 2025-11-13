@@ -46,3 +46,4 @@ L["The Will of Soggoth Messages"] = true
 L["Atal'zul the Soulreaver Messages"] = true
 L["Doomwalker Messages"] = true
 L["Doom Lord Kazzak Messages"] = true
+L["Titan Scroll Messages"] = true

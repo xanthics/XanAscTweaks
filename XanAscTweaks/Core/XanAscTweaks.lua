@@ -45,6 +45,7 @@ local defaults = {
         filterAtalzultheSoulreaver = false,
         filterDoomwalker = false,
         filterDoomLordKazzak = false,
+        filterTitanScrolls = false,
     },
 }
 
@@ -86,6 +87,8 @@ local function updateFilter()
     -- TBC World Bosses
     filters["%[.-Doomwalker.-%]"] = addon.db.profile.filterDoomwalker or nil
     filters["%[.-Doom Lord Kazzak.-%]"] = addon.db.profile.filterDoomLordKazzak or nil
+    -- Titan Scroll announcements
+    filters["%[.-Titan Scroll.-%]"] = addon.db.profile.filterTitanScrolls or nil
 end
 
 local function config_toggle_get(info) return addon.db.profile[info[#info]] end
@@ -140,6 +143,7 @@ local options = {
 						r["filterAtalzultheSoulreaver"] = L["Atal'zul the Soulreaver Messages"]
 						r["filterDoomwalker"] = L["Doomwalker Messages"]
 						r["filterDoomLordKazzak"] = L["Doom Lord Kazzak Messages"]
+						r["filterTitanScrolls"] = L["Titan Scroll Messages"]
 
 						return r
 					end,
@@ -328,6 +332,9 @@ function XAT:CommandHandler(msg)
 	elseif cmd == "posture" then
 		self.db.profile.filterPosture = toggle(self.db.profile.filterPosture, "Posture Check Messages")
 		updateFilter()
+	elseif cmd == "titanscroll" then
+		self.db.profile.filterTitanScrolls = toggle(self.db.profile.filterTitanScrolls, "Titan Scroll Messages")
+		updateFilter()
 	else
 		XAT:printmsg("Use '/xat all on|off' to quickly toggle all options.  Or use '/xat option` where option can be one of;")
 		local options = {
@@ -355,6 +362,7 @@ function XAT:CommandHandler(msg)
 			status(self.db.profile.filterHardcore) .. " `hardcore` is hiding Hardcore mode messages.",
 			status(self.db.profile.filterKeeperScroll) .. " `keeperscroll` is hiding Keeper's Scroll messages.",
 			status(self.db.profile.filterPosture) .. " `posture` is hiding Posture Check messages.",
+			status(self.db.profile.filterTitanScrolls) .. " `titanscroll` is hiding Titan Scroll blessing announcements.",
 		}
 		for _, option in pairs(options) do
 			XAT:printmsg(option, true)
