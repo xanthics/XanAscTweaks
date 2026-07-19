@@ -163,6 +163,7 @@ local options = {
 						r["filterAscension"] = L["Remove Ascension Chat on tab 1"]
 						r["filterWorld"] = L["Remove World Chat on tab 1"]
 						r["autoGrabVanity"] = L["Automatically grab unknown Vanity Spells"]
+						r["displayOutput"] = L["Display Chat Output when Grabbing Vanities"]
 
 						return r
 					end,

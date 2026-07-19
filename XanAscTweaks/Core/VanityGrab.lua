@@ -1,7 +1,9 @@
 function XAT:getVanity()
 	local next = table.remove(XAT.grablist)
-	if CheckKnownItem(next) then RequestDeliverVanityCollectionItem(next) end
-	DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": Grabbing " .. VANITY_ITEMS[next].name.. " (" .. next .. "). " .. #XAT.grablist .. " item(s) remaining.")
+	if C_VanityCollection.IsCollectionItemOwned(next) then RequestDeliverVanityCollectionItem(next) end
+	if self.db.profile.displayOutput == true then
+		DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": Grabbing " .. VANITY_ITEMS[next].name.. " (" .. next .. "). " .. #XAT.grablist .. " item(s) remaining.")
+	end
 	if #XAT.grablist <= 0 then self:CancelTimer(self.getVanityTimer) end
 end
 
@@ -117,39 +119,39 @@ function XAT:grabVanity()
 	local mmm = {}
 	local max_mmm = 0
 	local known_mmm = 0
-	for k, v in pairs(VANITY_ITEMS) do
-		if C_VanityCollection.IsCollectionItemOwned(k) then
-			if v.learnedSpell > 1 then
-				local _, _, _, _, _, _, s = GetItemInfo(v.itemid)
-				local name, rank, known = isManastorm(v)
+	for _, vanity_item in pairs(C_VanityCollection.GetAllItems()) do
+		if C_VanityCollection.IsCollectionItemOwned(vanity_item.itemid) then
+			if vanity_item.learnedSpell > 1 then
+				local _, _, _, _, _, _, s = GetItemInfo(vanity_item.itemid)
+				local name, rank, known = isManastorm(vanity_item)
 				if name then
-					if not mCache[name] or mCache[name].rank < rank then mCache[name] = { ["rank"] = rank, ["known"] = known, ["id"] = k, ["itemid"] = v.itemid } end
-				elseif v.name:find("Millhouse Mobility Mixture %(Upgrade") then
+					if not mCache[name] or mCache[name].rank < rank then mCache[name] = { ["rank"] = rank, ["known"] = known, ["id"] = vanity_item.itemid, ["itemid"] = vanity_item.itemid } end
+				elseif vanity_item.name:find("Millhouse Mobility Mixture %(Upgrade") then
 					if C_Config.GetBoolConfig("CONFIG_MANASTORM_ENABLED") then
-						local rank = tonumber(v.name:match("Millhouse Mobility Mixture %(Upgrade Rank (%d+)"))
+						local rank = tonumber(vanity_item.name:match("Millhouse Mobility Mixture %(Upgrade Rank (%d+)"))
 						if rank > max_mmm then max_mmm = rank end
-						if IsSpellKnown(v.learnedSpell) and rank > known_mmm then known_mmm = rank end
-						mmm[rank] = { ["id"] = k, ["itemid"] = v.itemid }
+						if IsSpellKnown(vanity_item.learnedSpell) and rank > known_mmm then known_mmm = rank end
+						mmm[rank] = { ["id"] = vanity_item.itemid, ["itemid"] = vanity_item.itemid }
 					end
-				elseif not (IsSpellKnown(v.learnedSpell) or known_spells[v.learnedSpell]) and not held_items[v.itemid] then
-					if badItems["All"][v.itemid] or badItems[UnitFactionGroup("player")][v.itemid] or (v.name:find("Tome of") and not C_Player:IsHero()) then
-						-- DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": Skipping " .. v.name .. " as it potentially gives an unusable item instead of the spell.")
+				elseif not (IsSpellKnown(vanity_item.learnedSpell) or known_spells[vanity_item.learnedSpell]) and not held_items[vanity_item.itemid] then
+					if badItems["All"][vanity_item.itemid] or badItems[UnitFactionGroup("player")][vanity_item.itemid] or (vanity_item.name:find("Tome of") and not C_Player:IsHero()) then
+						-- DEFAULT_CHAT_FRAME:AddMessage(XAT:setColor("XAT") .. ": Skipping " .. vanity_item.name .. " as it potentially gives an unusable item instead of the spell.")
 					else
-						table.insert(XAT.grablist, k)
+						table.insert(XAT.grablist, vanity_item.itemid)
 					end
 				end
 			else
-				if nestedSpell[v.itemid] and not held_items[v.itemid] then
-					local spellid = nestedSpell[v.itemid]
+				if nestedSpell[vanity_item.itemid] and not held_items[vanity_item.itemid] then
+					local spellid = nestedSpell[vanity_item.itemid]
 					if not IsSpellKnown(spellid) then
-						table.insert(XAT.grablist, k)
+						table.insert(XAT.grablist, vanity_item.itemid)
 					end
 				end
 			end
 		end
 	end
-	for k, v in pairs(mCache) do
-		if not v.known and not held_items[v.itemid] then table.insert(XAT.grablist, v.id) end
+	for _, v_i in pairs(mCache) do
+		if not v_i.known and not held_items[v_i.itemid] then table.insert(XAT.grablist, v_i.id) end
 	end
 	for i = known_mmm + 1, max_mmm do
 		if not held_items[mmm[i].itemid] then table.insert(XAT.grablist, mmm[i].id) end

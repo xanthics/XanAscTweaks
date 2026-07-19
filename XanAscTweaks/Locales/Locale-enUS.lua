@@ -46,3 +46,5 @@ L["The Will of Soggoth Messages"] = true
 L["Atal'zul the Soulreaver Messages"] = true
 L["Doomwalker Messages"] = true
 L["Doom Lord Kazzak Messages"] = true
+L["Kaldros Depthbreaker Messages"] = true
+L["Display Chat Output when Grabbing Vanities"] = true
