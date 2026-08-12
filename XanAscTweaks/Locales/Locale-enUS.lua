@@ -44,6 +44,7 @@ L["Lord Kazzak Messages"] = true
 L["Setis Messages"] = true
 L["The Will of Soggoth Messages"] = true
 L["Atal'zul the Soulreaver Messages"] = true
+L["Possessed Statue of the Cardinal"] = true
 L["Doomwalker Messages"] = true
 L["Doom Lord Kazzak Messages"] = true
 L["Kaldros Depthbreaker Messages"] = true

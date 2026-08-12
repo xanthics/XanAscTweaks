@@ -43,6 +43,7 @@ local defaults = {
         filterSetis = false,
         filterTheWillofSoggoth = false,
         filterAtalzultheSoulreaver = false,
+		filterPossessedStatueoftheCardinal = false,
         filterDoomwalker = false,
         filterDoomLordKazzak = false,
     },
@@ -83,6 +84,7 @@ local function updateFilter()
     filters["%[.-Setis.-%]"] = addon.db.profile.filterSetis or nil
     filters["%[.-The Will of Soggoth.-%]"] = addon.db.profile.filterTheWillofSoggoth or nil
     filters["%[.-Atal'zul, the Soulreaver.-%]"] = addon.db.profile.filterAtalzultheSoulreaver or nil    
+    filters["%[.-Possessed Statue of the Cardinal.-%]"] = addon.db.profile.filterPossessedStatueoftheCardinal or nil    
     -- TBC World Bosses
     filters["%[.-Doomwalker.-%]"] = addon.db.profile.filterDoomwalker or nil
     filters["%[.-Doom Lord Kazzak.-%]"] = addon.db.profile.filterDoomLordKazzak or nil
@@ -138,6 +140,7 @@ local options = {
 						r["filterSetis"] = L["Setis Messages"]
 						r["filterTheWillofSoggoth"] = L["The Will of Soggoth Messages"]
 						r["filterAtalzultheSoulreaver"] = L["Atal'zul the Soulreaver Messages"]
+						r["filterPossessedStatueoftheCardinal"] = L["Possessed Statue of the Cardinal"]
 						r["filterDoomwalker"] = L["Doomwalker Messages"]
 						r["filterDoomLordKazzak"] = L["Doom Lord Kazzak Messages"]
 
